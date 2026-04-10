@@ -1,120 +1,150 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { ShieldCheck, RefreshCcw, Headphones, CreditCard, MapPin, Award } from "lucide-react";
 
-const PERKS = [
-  "Expert local guides born & raised in Japan",
-  "Small groups — max 12 people for intimacy",
-  "Free cancellation up to 24 hours before",
-  "Offline maps & itinerary app included",
-  "Instant booking confirmation",
-  "24/7 support before & during your trip",
+const TRUST_ITEMS = [
+  {
+    icon: ShieldCheck,
+    title: "Secure Payments",
+    description: "Your payment is protected by Stripe — the world's leading payment platform.",
+  },
+  {
+    icon: RefreshCcw,
+    title: "Free Cancellation",
+    description: "Cancel up to 24 hours before your tour starts for a full refund. No questions.",
+  },
+  {
+    icon: Headphones,
+    title: "24/7 Support",
+    description: "Our team is on hand before, during, and after your trip via live chat or email.",
+  },
+  {
+    icon: CreditCard,
+    title: "No Hidden Fees",
+    description: "The price you see is the price you pay. Taxes and guide fees included.",
+  },
+  {
+    icon: MapPin,
+    title: "Local Experts",
+    description: "Every guide is born and raised in Japan — you get insider knowledge, not scripts.",
+  },
+  {
+    icon: Award,
+    title: "Vetted Quality",
+    description: "All tours are personally reviewed. Only the best 5% of experiences make the cut.",
+  },
+];
+
+const REVIEWS = [
+  {
+    name: "Sarah M.",
+    country: "🇺🇸 USA",
+    tour: "Tokyo Hidden Gems",
+    rating: 5,
+    text: "Absolutely incredible. Our guide knew every hidden alley in Shinjuku — found spots I'd never have discovered alone. Already planning my next trip!",
+    initial: "S",
+  },
+  {
+    name: "Tom K.",
+    country: "🇬🇧 UK",
+    tour: "Kyoto Temples & Tea",
+    rating: 5,
+    text: "The tea ceremony was the highlight of our Japan trip. The guide's passion for local history made every temple come alive. Worth every penny.",
+    initial: "T",
+  },
+  {
+    name: "Yuki R.",
+    country: "🇦🇺 Australia",
+    tour: "Mt. Fuji Sunrise",
+    rating: 5,
+    text: "Watching the sunrise over Fuji was a bucket-list moment. The small group size made it so personal. No rushing, no crowds — just pure Japan.",
+    initial: "Y",
+  },
 ];
 
 export function WhyUsSection() {
   return (
-    <section className="py-24 bg-secondary overflow-hidden relative">
-      {/* Decorative circle */}
-      <div
-        className="absolute -right-32 -top-32 w-96 h-96 rounded-full opacity-10"
-        style={{ background: "radial-gradient(circle, #C41230 0%, transparent 70%)" }}
-      />
-      <div
-        className="absolute -left-24 -bottom-24 w-72 h-72 rounded-full opacity-10"
-        style={{ background: "radial-gradient(circle, #C8A84B 0%, transparent 70%)" }}
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-
-          {/* Left: text */}
-          <div>
-            <div className="inline-flex items-center gap-2 mb-6">
-              <div className="h-px w-8 bg-accent/50" />
-              <span className="text-accent text-xs font-bold tracking-widest uppercase">
-                Our Promise
-              </span>
-            </div>
-
-            <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
-              Travel Japan with{" "}
-              <span className="text-accent italic">Confidence</span>
+    <>
+      {/* ── Trust Badges ── */}
+      <section className="py-14 bg-surface border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">Why Book With Us</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground">
+              Your journey, stress-free
             </h2>
-            <p className="text-white/60 text-lg mb-8 leading-relaxed">
-              We handle every detail — from airport logistics to dinner reservations.
-              All you need to do is show up and be amazed.
-            </p>
-
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
-              {PERKS.map((perk) => (
-                <li key={perk} className="flex items-start gap-3">
-                  <CheckCircle2 className="size-5 text-accent shrink-0 mt-0.5" />
-                  <span className="text-white/80 text-sm leading-snug">{perk}</span>
-                </li>
-              ))}
-            </ul>
-
-            <Link href="/tours">
-              <Button
-                size="lg"
-                className="bg-accent text-secondary hover:bg-accent/90 font-semibold gap-2 shadow-lg"
-              >
-                Start Planning
-                <ArrowRight className="size-4" />
-              </Button>
-            </Link>
           </div>
 
-          {/* Right: testimonial card */}
-          <div className="relative">
-            {/* Decorative card behind */}
-            <div className="absolute inset-0 rounded-3xl bg-white/5 border border-white/10 translate-x-4 translate-y-4" />
-
-            {/* Main card */}
-            <div className="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8">
-              {/* Stars */}
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className="text-accent text-xl">★</span>
-                ))}
-              </div>
-
-              <blockquote className="text-white text-lg leading-relaxed italic mb-6">
-                &ldquo;I&apos;ve traveled to Japan twice before but this tour opened my eyes
-                to things I never would have found on my own. The guide&apos;s knowledge
-                of local history was incredible. I&apos;ll be back next year.&rdquo;
-              </blockquote>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg">
-                  S
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {TRUST_ITEMS.map(({ icon: Icon, title, description }) => (
+              <div
+                key={title}
+                className="flex flex-col items-center text-center p-5 bg-white rounded-2xl border border-border hover:shadow-sm transition-shadow"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center mb-3">
+                  <Icon className="size-5 text-primary" />
                 </div>
-                <div>
-                  <div className="text-white font-semibold">Sarah Mitchell</div>
-                  <div className="text-white/50 text-sm">Tokyo Hidden Gems Tour · March 2025</div>
-                </div>
+                <h3 className="font-semibold text-sm text-foreground mb-1.5 leading-tight">{title}</h3>
+                <p className="text-xs text-muted leading-relaxed">{description}</p>
               </div>
-
-              {/* Stat pills */}
-              <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-white/15">
-                {[
-                  { label: "Tours Completed", value: "200+" },
-                  { label: "5★ Reviews",       value: "1,800+" },
-                  { label: "Repeat Guests",    value: "60%" },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="flex-1 min-w-24 text-center px-4 py-3 rounded-xl bg-white/10 border border-white/10"
-                  >
-                    <div className="text-white font-bold text-xl">{stat.value}</div>
-                    <div className="text-white/50 text-xs mt-0.5">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* ── Reviews ── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">
+                Traveler Reviews
+              </p>
+              <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground">
+                Real stories from real travelers
+              </h2>
+            </div>
+            {/* Aggregate score */}
+            <div className="hidden sm:flex flex-col items-center bg-surface rounded-2xl px-6 py-4 border border-border">
+              <span className="font-display font-bold text-4xl text-primary leading-none">4.9</span>
+              <div className="flex gap-0.5 my-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span key={i} className="text-accent text-sm">★</span>
+                ))}
+              </div>
+              <span className="text-xs text-muted">1,800+ reviews</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {REVIEWS.map((r) => (
+              <div
+                key={r.name}
+                className="bg-surface rounded-2xl border border-border p-6 hover:shadow-sm transition-shadow"
+              >
+                {/* Stars */}
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: r.rating }).map((_, i) => (
+                    <span key={i} className="text-accent">★</span>
+                  ))}
+                </div>
+
+                <p className="text-foreground text-sm leading-relaxed mb-5 italic">
+                  &ldquo;{r.text}&rdquo;
+                </p>
+
+                <div className="flex items-center gap-3 pt-4 border-t border-border">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    {r.initial}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-foreground">{r.name}</div>
+                    <div className="text-xs text-muted">{r.country} · {r.tour}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

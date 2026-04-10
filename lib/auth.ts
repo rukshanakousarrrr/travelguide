@@ -34,13 +34,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Admin-only credentials login
         if (user.role !== "ADMIN") return null;
 
-        // Admin password is stored in env (single admin account)
-        const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
-        if (!adminPasswordHash) return null;
+        // Per-user hashedPassword takes priority; fall back to shared env hash
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const hashToCheck = (user as any).hashedPassword ?? process.env.ADMIN_PASSWORD_HASH;
+        if (!hashToCheck) return null;
 
         const valid = await bcrypt.compare(
           credentials.password as string,
-          adminPasswordHash
+          hashToCheck
         );
         if (!valid) return null;
 
@@ -50,19 +51,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
 
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
 
   callbacks: {
-    async session({ session, user }) {
+    async jwt({ token, user }) {
+      // On first sign-in, persist id + role into the JWT
+      if (user) {
+        token.id   = user.id;
+        token.role = (user as { role: "ADMIN" | "CUSTOMER" }).role;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id   = user.id;
-        session.user.role = (user as { role: "ADMIN" | "CUSTOMER" }).role;
+        session.user.id   = token.id as string;
+        session.user.role = token.role as "ADMIN" | "CUSTOMER";
       }
       return session;
     },
 
-    async signIn({ user, account }) {
+    async signIn({ account }) {
       // Block credential sign-in for non-admins
       if (account?.provider === "credentials") {
         return true; // already validated in authorize()

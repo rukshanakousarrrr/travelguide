@@ -36,7 +36,7 @@ export function TourCard({
     <Link
       href={`/tours/${slug}`}
       className="group block rounded-2xl overflow-hidden bg-background border border-border
-                 shadow-[var(--shadow-card)] hover:shadow-lg hover:-translate-y-1
+                 shadow-(--shadow-card) hover:shadow-lg hover:-translate-y-1
                  transition-all duration-300"
     >
       {/* Image area */}
@@ -48,7 +48,7 @@ export function TourCard({
         />
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-secondary/70 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-secondary/70 via-transparent to-transparent" />
 
         {/* Category badge */}
         <div className="absolute top-3 left-3">

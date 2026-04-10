@@ -58,16 +58,17 @@ model VerificationToken {
 // ─────────────────────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  role          UserRole  @default(CUSTOMER)
-  phone         String?
-  nationality   String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  role           UserRole  @default(CUSTOMER)
+  hashedPassword String?   // used for admin credential login
+  phone          String?
+  nationality    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   accounts      Account[]
   sessions      Session[]
@@ -94,23 +95,29 @@ model Tour {
   highlights       Json           // string[]
   includes         Json           // string[]
   excludes         Json           // string[]
-  itinerary        Json           // { day: number; title: string; description: string }[]
-  duration         Int            // days
+  itinerary        Json           // { order: number; title: string; description: string; stayMinutes: string; isOptional: boolean }[]
+  duration         Float          // time value
+  durationType     String         @default("days") // "hours" | "days"
   maxGroupSize     Int
   minGroupSize     Int            @default(1)
+  dailyCapacity    Int            @default(10)   // max bookings/guests available per day
   meetingPoint     String
   endPoint         String?
   location         String
   prefecture       String?        // Tokyo, Kyoto, Osaka, etc.
   country          String         @default("Japan")
+  countryCode      String?
+  stateCode        String?
   category         TourCategory
   difficulty       TourDifficulty @default(MODERATE)
   languages        Json           // string[] — guide languages
   serviceProvider  String?        // plain text field, no login
   basePrice        Decimal        @db.Decimal(10, 2)
   childPrice       Decimal?       @db.Decimal(10, 2)
+  priceTiers       Json?          // { minGuests: number, maxGuests: number, pricePerPerson: number }[]
   status           TourStatus     @default(DRAFT)
   featured         Boolean        @default(false)
+  likelyToSellOut  Boolean        @default(false)
   rating           Decimal?       @db.Decimal(3, 2)
   reviewCount      Int            @default(0)
   metaTitle        String?

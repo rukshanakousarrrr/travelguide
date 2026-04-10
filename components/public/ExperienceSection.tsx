@@ -1,105 +1,96 @@
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const CATEGORIES = [
   {
-    icon: "🏯",
-    title: "Nature & Scenery",
-    description:
-      "Cherry blossoms, alpine lakes, bamboo forests and coastal vistas that will leave you breathless.",
-    href: "/tours?category=NATURE",
-  },
-  {
-    icon: "⛩️",
+    emoji: "⛩️",
     title: "Culture & Heritage",
-    description:
-      "Ancient temples, tea ceremonies, samurai history and geisha performances — Japan's soul revealed.",
+    count: 22,
     href: "/tours?category=CULTURAL",
+    color: "bg-primary-light",
+    hoverBorder: "hover:border-primary/30",
   },
   {
-    icon: "🍜",
+    emoji: "🍜",
     title: "Food & Drink",
-    description:
-      "From hidden ramen shops to Michelin-starred sushi counters, eat Japan like a local.",
+    count: 16,
     href: "/tours?category=FOOD_AND_DRINK",
+    color: "bg-accent-light",
+    hoverBorder: "hover:border-accent/30",
   },
   {
-    icon: "🧘",
-    title: "Wellness & Slow Travel",
-    description:
-      "Ryokan stays, onsen soaks, forest bathing and mindful journeys through Japan's countryside.",
+    emoji: "🏯",
+    title: "Nature & Scenery",
+    count: 14,
     href: "/tours?category=NATURE",
+    color: "bg-success-light",
+    hoverBorder: "hover:border-success/30",
   },
   {
-    icon: "🎌",
-    title: "Adventure & Exploration",
-    description:
-      "Night hikes up Fuji, cycling between shrines, or surfing the wild Shikoku coast.",
+    emoji: "🎌",
+    title: "Adventure",
+    count: 9,
     href: "/tours?category=ADVENTURE",
+    color: "bg-info-light",
+    hoverBorder: "hover:border-info/30",
   },
   {
-    icon: "🏙️",
-    title: "City & Nightlife",
-    description:
-      "Tokyo's neon jungle, Osaka's vibrant dotonbori and Kyoto's lantern-lit evenings.",
+    emoji: "🏙️",
+    title: "City Tours",
+    count: 11,
     href: "/tours?category=CITY_TOUR",
+    color: "bg-surface-2",
+    hoverBorder: "hover:border-border-dark",
+  },
+  {
+    emoji: "🧘",
+    title: "Multi-Day",
+    count: 7,
+    href: "/tours?category=MULTI_DAY",
+    color: "bg-warning-light",
+    hoverBorder: "hover:border-warning/30",
   },
 ];
 
 export function ExperienceSection() {
   return (
-    <section className="py-24" style={{ background: "var(--color-surface)" }}>
+    <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="h-px w-8 bg-accent/60" />
-            <span className="text-accent text-xs font-bold tracking-widest uppercase">
-              Why Choose Us
-            </span>
-            <div className="h-px w-8 bg-accent/60" />
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">
+              Browse by Category
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground">
+              What kind of trip?
+            </h2>
           </div>
-
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-foreground mb-4">
-            More Than a Trip —{" "}
-            <span className="italic text-primary">It&apos;s the Experience</span>
-          </h2>
-          <p className="text-muted text-lg max-w-xl mx-auto">
-            We believe travel should transform you. Every detail is curated so
-            you can focus on being present.
-          </p>
+          <Link
+            href="/tours"
+            className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-primary hover:underline underline-offset-4"
+          >
+            All categories
+            <ArrowRight className="size-4" />
+          </Link>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.title}
               href={cat.href}
-              className="group p-6 bg-white rounded-2xl border border-border
-                         hover:border-primary/30 hover:shadow-md
-                         transition-all duration-300"
+              className={`group flex flex-col items-center text-center p-5 rounded-2xl border border-border ${cat.hoverBorder} hover:shadow-sm transition-all duration-200`}
             >
-              {/* Icon */}
-              <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center text-2xl mb-4
-                              group-hover:bg-primary group-hover:scale-110 transition-all duration-300">
-                <span className="group-hover:grayscale-0 transition-all">{cat.icon}</span>
+              <div className={`w-14 h-14 rounded-2xl ${cat.color} flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform duration-200`}>
+                {cat.emoji}
               </div>
-
-              {/* Text */}
-              <h3 className="font-semibold text-foreground text-lg mb-2 group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors leading-tight mb-1">
                 {cat.title}
               </h3>
-              <p className="text-muted text-sm leading-relaxed mb-4">
-                {cat.description}
-              </p>
-
-              {/* Read more */}
-              <div className="flex items-center gap-1.5 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200">
-                Explore
-                <ArrowRight className="size-3.5" />
-              </div>
+              <span className="text-xs text-muted">{cat.count} tours</span>
             </Link>
           ))}
         </div>
