@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
+import { getStripe, getWebhookSecret } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, bookingConfirmationHtml } from "@/lib/email";
 import { formatPrice, formatDate } from "@/lib/utils";
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET);
+    event = getStripe().webhooks.constructEvent(body, signature, getWebhookSecret());
   } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
