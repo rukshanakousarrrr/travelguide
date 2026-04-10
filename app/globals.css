@@ -1,26 +1,211 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS — Japan Tour Booking Platform
+   White theme · Japan-inspired palette
+────────────────────────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --color-primary:       #C41230; /* Beni — Japan crimson            */
+  --color-primary-dark:  #A00E25; /* deeper hover state              */
+  --color-primary-light: #F5E6E9; /* tint for badges / backgrounds   */
+  --color-secondary:     #1B2847; /* Kachi — deep navy ink           */
+  --color-accent:        #C8A84B; /* Kin — Japanese gold             */
+  --color-accent-light:  #F7F0DC; /* gold tint                       */
+
+  /* Neutral surface scale */
+  --color-background:    #FFFFFF;
+  --color-surface:       #F8F7F5; /* washi-paper warm off-white      */
+  --color-surface-2:     #F1EFE9; /* slightly darker surface         */
+  --color-border:        #E4E0D9; /* warm light border               */
+  --color-border-dark:   #C8C4BB;
+
+  /* Text */
+  --color-foreground:    #111111;
+  --color-muted:         #7A746D; /* muted / placeholder text        */
+  --color-subtle:        #A8A29E; /* very muted                      */
+
+  /* Semantic */
+  --color-success:       #15803D;
+  --color-success-light: #DCFCE7;
+  --color-warning:       #B45309;
+  --color-warning-light: #FEF3C7;
+  --color-error:         #DC2626;
+  --color-error-light:   #FEE2E2;
+  --color-info:          #1B6FA8;
+  --color-info-light:    #DBEAFE;
+
+  /* Typography */
+  --font-sans:    var(--font-inter);
+  --font-display: var(--font-playfair);
+
+  /* Spacing / radius */
+  --radius-sm:   0.25rem;
+  --radius-md:   0.5rem;
+  --radius-lg:   0.75rem;
+  --radius-xl:   1rem;
+  --radius-2xl:  1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+  --shadow-xl:  0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+  --shadow-card: 0 0 0 1px var(--color-border), 0 2px 8px rgb(0 0 0 / 0.06);
 }
+
+/* ─────────────────────────────────────────────
+   TAILWIND v4 THEME REGISTRATION
+────────────────────────────────────────────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts */
+  --font-sans:    var(--font-inter);
+  --font-display: var(--font-playfair);
+  --font-mono:    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+
+  /* Brand colors */
+  --color-primary:       var(--color-primary);
+  --color-primary-dark:  var(--color-primary-dark);
+  --color-primary-light: var(--color-primary-light);
+  --color-secondary:     var(--color-secondary);
+  --color-accent:        var(--color-accent);
+  --color-accent-light:  var(--color-accent-light);
+
+  /* Surface */
+  --color-background:  var(--color-background);
+  --color-surface:     var(--color-surface);
+  --color-surface-2:   var(--color-surface-2);
+  --color-border:      var(--color-border);
+  --color-border-dark: var(--color-border-dark);
+
+  /* Text */
+  --color-foreground: var(--color-foreground);
+  --color-muted:      var(--color-muted);
+  --color-subtle:     var(--color-subtle);
+
+  /* Semantic */
+  --color-success:       var(--color-success);
+  --color-success-light: var(--color-success-light);
+  --color-warning:       var(--color-warning);
+  --color-warning-light: var(--color-warning-light);
+  --color-error:         var(--color-error);
+  --color-error-light:   var(--color-error-light);
+  --color-info:          var(--color-info);
+  --color-info-light:    var(--color-info-light);
+
+  /* Radius */
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-xl:   var(--radius-xl);
+  --radius-2xl:  var(--radius-2xl);
+  --radius-full: var(--radius-full);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─────────────────────────────────────────────
+   BASE STYLES
+────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   TYPOGRAPHY HELPERS
+────────────────────────────────────────────── */
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h4, h5, h6 {
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+/* ─────────────────────────────────────────────
+   SCROLLBAR (subtle, matches brand)
+────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-dark);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-muted);
+}
+
+/* ─────────────────────────────────────────────
+   FOCUS RING (accessible, on-brand)
+────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+────────────────────────────────────────────── */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0;  }
+}
+
+.animate-fade-in        { animation: fade-in 0.3s ease both; }
+.animate-slide-in-right { animation: slide-in-right 0.25s ease both; }
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-surface-2) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--radius-md);
 }
