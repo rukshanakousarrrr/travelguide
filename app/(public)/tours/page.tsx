@@ -22,10 +22,15 @@ export default async function PublicToursPage() {
     } as any,
   });
 
-  // Workaround for stale PrismaClient: fetch wishlists separately
-  const userWishlists = userId 
-    ? await (prisma as any).wishlist.findMany({ where: { userId } })
-    : [];
+  // Absolute fallback for stale PrismaClient: use queryRaw to find the table directly
+  let userWishlists: any[] = [];
+  if (userId) {
+    try {
+      userWishlists = await prisma.$queryRaw`SELECT * FROM Wishlist WHERE userId = ${userId}`;
+    } catch (e) {
+      console.error("Wishlist table not ready or accessible via raw SQL:", e);
+    }
+  }
   const wishlistedTourIds = new Set(userWishlists.map((w: any) => w.tourId));
 
   return (

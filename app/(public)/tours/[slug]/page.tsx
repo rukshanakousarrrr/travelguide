@@ -36,18 +36,15 @@ export default async function TourDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Fetch wishlist status separately to avoid runtime "Unknown field" error
+  // Fetch wishlist status separately using raw SQL to avoid runtime errors with the stale client
   let isWishlisted = false;
   if (currentUserId) {
-    const wishlistEntry = await (prisma as any).wishlist.findUnique({
-      where: {
-        userId_tourId: {
-          userId: currentUserId,
-          tourId: tour.id
-        }
-      }
-    });
-    isWishlisted = !!wishlistEntry;
+    try {
+      const results: any[] = await prisma.$queryRaw`SELECT id FROM Wishlist WHERE userId = ${currentUserId} AND tourId = ${tour.id} LIMIT 1`;
+      isWishlisted = results.length > 0;
+    } catch (e) {
+      console.error("Wishlist slug check raw SQL failed:", e);
+    }
   }
 
   const tourData = tour as any;

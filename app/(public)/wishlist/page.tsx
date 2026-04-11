@@ -12,20 +12,33 @@ export default async function WishlistPage() {
     redirect("/?auth=login");
   }
 
-  const wishlistedItems = await prisma.wishlist.findMany({
-    where: { userId: session.user.id },
-    include: {
-      tour: {
+  // Use raw SQL to get IDs because the Prisma client is stale and doesn't know about Wishlist model
+  const wishlistRows: any[] = await prisma.$queryRaw`
+    SELECT tourId FROM Wishlist 
+    WHERE userId = ${session.user.id} 
+    ORDER BY createdAt DESC
+  `;
+
+  const tourIds = wishlistRows.map(row => row.tourId);
+
+  // Now fetch the actual tours using the IDs. Tour model is up-to-date in client.
+  const wishlistedTours = tourIds.length > 0 
+    ? await prisma.tour.findMany({
+        where: { id: { in: tourIds } },
         include: {
           images: {
             where: { isPrimary: true },
             take: 1,
           },
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+        } as any,
+      })
+    : [];
+
+  // Re-sort tours to match wishlist order (Prisma's 'in' doesn't guarantee order)
+  const sortedTours = tourIds.map(id => wishlistedTours.find(t => t.id === id)).filter(Boolean);
+
+  // Map to the shape expected by the UI (array of objects with a 'tour' property)
+  const wishlistedItems = sortedTours.map(tour => ({ tour }));
 
   return (
     <div className="bg-[#F8F7F5] min-h-screen pt-28 pb-12">

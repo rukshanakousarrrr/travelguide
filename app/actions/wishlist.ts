@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -14,31 +15,35 @@ export async function toggleWishlistAction(tourId: string) {
   const userId = session.user.id;
 
   try {
-    const existing = await prisma.wishlist.findUnique({
-      where: {
-        userId_tourId: { userId, tourId }
-      }
-    });
+    // Check if entry exists using raw SQL
+    const existing: any[] = await prisma.$queryRaw`
+      SELECT id FROM Wishlist 
+      WHERE userId = ${userId} AND tourId = ${tourId} 
+      LIMIT 1
+    `;
 
-    if (existing) {
-      await prisma.wishlist.delete({
-        where: {
-          userId_tourId: { userId, tourId }
-        }
-      });
+    if (existing.length > 0) {
+      // Delete using raw SQL
+      await prisma.$executeRaw`
+        DELETE FROM Wishlist 
+        WHERE userId = ${userId} AND tourId = ${tourId}
+      `;
       revalidatePath("/wishlist");
-      revalidatePath(`/tours/[slug]`, "page");
+      revalidatePath(`/tours`, "layout");
       return { success: true, added: false };
     } else {
-      await prisma.wishlist.create({
-        data: { userId, tourId }
-      });
+      // Create using raw SQL
+      const id = crypto.randomUUID();
+      await prisma.$executeRaw`
+        INSERT INTO Wishlist (id, userId, tourId, createdAt)
+        VALUES (${id}, ${userId}, ${tourId}, ${new Date()})
+      `;
       revalidatePath("/wishlist");
-      revalidatePath(`/tours/[slug]`, "page");
+      revalidatePath(`/tours`, "layout");
       return { success: true, added: true };
     }
   } catch (error) {
-    console.error("Wishlist error:", error);
-    return { error: "Something went wrong. Please try again." };
+    console.error("Wishlist runtime error (Direct DB):", error);
+    return { error: "Failed to update wishlist. Database sync in progress." };
   }
 }

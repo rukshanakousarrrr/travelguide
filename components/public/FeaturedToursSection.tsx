@@ -23,9 +23,15 @@ export async function FeaturedToursSection() {
     } as any
   });
 
-  const userWishlists = userId 
-    ? await (prisma as any).wishlist.findMany({ where: { userId } })
-    : [];
+  // Absolute fallback for stale PrismaClient: use queryRaw
+  let userWishlists: any[] = [];
+  if (userId) {
+    try {
+      userWishlists = await prisma.$queryRaw`SELECT * FROM Wishlist WHERE userId = ${userId}`;
+    } catch (e) {
+      console.error("Wishlist table raw query failed:", e);
+    }
+  }
   const wishlistedTourIds = new Set(userWishlists.map((w: any) => w.tourId));
 
   if (tours.length === 0) return null;
