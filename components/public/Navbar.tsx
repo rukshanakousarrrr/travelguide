@@ -2,20 +2,29 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, MapPin, Heart, User, LogIn, LogOut, Bell, HelpCircle, ChevronRight, Ticket } from "lucide-react";
+import { Menu, X, MapPin, Heart, User, LogIn, LogOut, Bell, HelpCircle, ChevronRight, Ticket, Globe, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { COMPANY_NAME, NAV_LINKS } from "@/lib/constants";
 import { signOut } from "next-auth/react";
 
+interface DestinationNav {
+  id: string;
+  name: string;
+  places: { id: string; name: string; subtitle: string | null; imageUrl: string | null; linkQuery: string | null }[];
+}
+
 interface NavbarProps {
   transparent?: boolean;
   isLoggedIn?: boolean;
+  destinations?: DestinationNav[];
 }
 
-export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps) {
-  const [scrolled,   setScrolled]   = useState(false);
-  const [menuOpen,   setMenuOpen]   = useState(false);
+export function Navbar({ transparent = false, isLoggedIn = false, destinations = [] }: NavbarProps) {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [destOpen, setDestOpen] = useState(false);
+  const [activeDestId, setActiveDestId] = useState<string | null>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,6 +48,8 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
 
   const isWhite = !transparent || scrolled;
 
+  const activeDest = destinations.find((d) => d.id === activeDestId) ?? destinations[0] ?? null;
+
   return (
     <header
       className={cn(
@@ -57,7 +68,7 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
               "w-8 h-8 rounded-lg flex items-center justify-center",
               isWhite ? "bg-primary" : "bg-white/20 backdrop-blur-sm"
             )}>
-              <MapPin className={cn("size-4", isWhite ? "text-white" : "text-white")} />
+              <MapPin className="size-4 text-white" />
             </div>
             <span className={cn(
               "font-display font-semibold text-lg tracking-tight",
@@ -83,6 +94,29 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
                 {link.label}
               </Link>
             ))}
+
+            {/* Destinations mega-dropdown */}
+            {destinations.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    const next = !destOpen;
+                    setDestOpen(next);
+                    if (next && destinations.length > 0) setActiveDestId(destinations[0].id);
+                  }}
+                  className={cn(
+                    "flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-150",
+                    isWhite
+                      ? "text-foreground hover:bg-surface hover:text-primary"
+                      : "text-white/90 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  <Globe className="size-4" />
+                  Destinations
+                  <ChevronDown className={cn("size-3.5 transition-transform duration-150", destOpen && "rotate-180")} />
+                </button>
+              </div>
+            )}
           </nav>
 
           {/* Desktop CTA */}
@@ -104,7 +138,7 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
             </Link>
 
             <div className="relative" ref={profileRef}>
-              <button 
+              <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                 className="group flex flex-col items-center justify-center gap-1 transition-colors relative"
               >
@@ -112,8 +146,6 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
                 <span className={cn("text-[11px] font-bold tracking-wide", isWhite ? "text-[#111111]" : "text-white")}>
                   Profile
                 </span>
-                
-                {/* Active Indicator exactly matching screenshot red line */}
                 {profileMenuOpen && (
                   <div className="absolute -bottom-2.25 left-0 right-0 h-0.5 bg-[#C41230]" />
                 )}
@@ -124,11 +156,10 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
                   <div className="px-5 py-4">
                     <h3 className="text-[17px] font-extrabold" style={{ fontFamily: "var(--font-sans)" }}>Profile</h3>
                   </div>
-                  
                   <div className="flex flex-col py-1">
                     {!isLoggedIn ? (
-                      <Link 
-                        href="?auth=login" 
+                      <Link
+                        href="?auth=login"
                         onClick={() => setProfileMenuOpen(false)}
                         className="flex items-center gap-4 px-5 py-3 hover:bg-[#F8F7F5] transition-colors"
                       >
@@ -136,7 +167,7 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
                         <span className="text-[15px] font-semibold">Log in or sign up</span>
                       </Link>
                     ) : (
-                      <button 
+                      <button
                         onClick={() => {
                           setProfileMenuOpen(false);
                           signOut({ callbackUrl: "/" });
@@ -147,9 +178,7 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
                         <span className="text-[15px] font-semibold">Log out</span>
                       </button>
                     )}
-
                     <div className="h-px bg-[#E4E0D9] mx-5 my-2" />
-
                     <button className="flex items-center justify-between px-5 py-3 hover:bg-[#F8F7F5] transition-colors w-full text-left">
                       <div className="flex items-center gap-4">
                         <Bell className="size-5.5" />
@@ -157,9 +186,7 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
                       </div>
                       <ChevronRight className="size-4.5 text-[#A8A29E]" />
                     </button>
-
                     <div className="h-px bg-[#E4E0D9] mx-5 my-2" />
-
                     <button className="flex items-center gap-4 px-5 py-3 hover:bg-[#F8F7F5] transition-colors w-full text-left">
                       <HelpCircle className="size-5.5" />
                       <span className="text-[15px] font-semibold">Support</span>
@@ -185,6 +212,82 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
         </div>
       </div>
 
+      {/* Mega dropdown — rendered outside the nav flow to avoid stacking context issues */}
+      {destOpen && destinations.length > 0 && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40"
+            style={{ top: 72 }}
+            onClick={() => setDestOpen(false)}
+          />
+          {/* Panel */}
+          <div
+            className="fixed left-0 right-0 z-50 bg-white border-b border-[#E4E0D9]"
+            style={{ top: 72, boxShadow: "0 8px 32px -4px rgba(0,0,0,0.12)" }}
+          >
+            <div className="max-w-7xl mx-auto flex" style={{ minHeight: 340 }}>
+              {/* Left tabs */}
+              <div className="w-52 shrink-0 border-r border-[#E4E0D9] py-4">
+                <p className="px-5 pb-3 text-[10px] font-bold uppercase tracking-widest text-[#C41230]">
+                  Top attractions
+                </p>
+                {destinations.map((dest) => (
+                  <button
+                    key={dest.id}
+                    onMouseEnter={() => setActiveDestId(dest.id)}
+                    onClick={() => setActiveDestId(dest.id)}
+                    className={cn(
+                      "w-full text-left px-5 py-2.5 text-sm font-medium transition-colors",
+                      (activeDestId ?? destinations[0]?.id) === dest.id
+                        ? "text-[#C41230] font-semibold bg-[#FFF5F6]"
+                        : "text-[#333] hover:bg-[#F8F7F5]"
+                    )}
+                  >
+                    {dest.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Right: places grid */}
+              <div className="flex-1 py-6 px-8 overflow-y-auto" style={{ maxHeight: 480 }}>
+                {activeDest && (
+                  <div className="grid grid-cols-3 gap-x-6 gap-y-1">
+                    {activeDest.places.map((place) => (
+                      <Link
+                        key={place.id}
+                        href={"/tours?q=" + encodeURIComponent(place.linkQuery ?? place.name)}
+                        onClick={() => setDestOpen(false)}
+                        className="flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-[#F8F7F5] transition-colors group"
+                      >
+                        <div className="w-10 h-10 rounded-md shrink-0 overflow-hidden bg-[#E4E0D9]">
+                          {place.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <MapPin className="size-4 text-[#A8A29E]" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-[#111] leading-snug group-hover:text-[#C41230] transition-colors truncate">
+                            {place.name}
+                          </p>
+                          {place.subtitle && (
+                            <p className="text-xs text-[#7A746D] truncate leading-snug mt-0.5">{place.subtitle}</p>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-border animate-fade-in">
@@ -199,6 +302,29 @@ export function Navbar({ transparent = false, isLoggedIn = false }: NavbarProps)
                 {link.label}
               </Link>
             ))}
+
+            {destinations.length > 0 && (
+              <div className="pt-1">
+                <p className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#C41230]">Destinations</p>
+                {destinations.map((dest) => (
+                  <div key={dest.id}>
+                    <p className="px-4 pt-2 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-[#7A746D]">{dest.name}</p>
+                    {dest.places.map((place) => (
+                      <Link
+                        key={place.id}
+                        href={"/tours?q=" + encodeURIComponent(place.linkQuery ?? place.name)}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-foreground hover:bg-surface rounded-lg"
+                      >
+                        <MapPin className="size-4 text-[#C41230] shrink-0" />
+                        {place.name}
+                      </Link>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="pt-2 mt-1 border-t border-border flex flex-col gap-2">
               {isLoggedIn && (
                 <Link

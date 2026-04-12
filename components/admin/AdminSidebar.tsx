@@ -14,18 +14,20 @@ import {
   ChevronLeft,
   ChevronsLeft,
   X,
+  Globe,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 
 const navItems = [
-  { label: "Dashboard",  href: "/admin",           icon: LayoutDashboard },
-  { label: "Bookings",   href: "/admin/bookings",  icon: CalendarCheck   },
-  { label: "Tours",      href: "/admin/tours",     icon: Map             },
-  { label: "Users",      href: "/admin/users",     icon: Users           },
-  { label: "Analytics",  href: "/admin/analytics", icon: BarChart3       },
-  { label: "Chat",       href: "/admin/chat",      icon: MessageSquare   },
-  { label: "Settings",   href: "/admin/settings",  icon: Settings        },
+  { label: "Dashboard",    href: "/admin",                icon: LayoutDashboard },
+  { label: "Bookings",     href: "/admin/bookings",       icon: CalendarCheck   },
+  { label: "Tours",        href: "/admin/tours",          icon: Map             },
+  { label: "Destinations", href: "/admin/destinations",   icon: Globe           },
+  { label: "Users",        href: "/admin/users",          icon: Users           },
+  { label: "Analytics",    href: "/admin/analytics",      icon: BarChart3       },
+  { label: "Chat",         href: "/admin/chat",           icon: MessageSquare   },
+  { label: "Settings",     href: "/admin/settings",       icon: Settings        },
 ];
 
 interface AdminSidebarProps {
@@ -53,8 +55,8 @@ export function AdminSidebar({
       {/* ── Desktop sidebar ──────────────────────────────────────────────── */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col bg-[#1B2847] text-white transition-all duration-300 ease-in-out flex-shrink-0",
-          collapsed ? "w-[68px]" : "w-[240px]"
+          "hidden lg:flex flex-col bg-[#1B2847] text-white transition-all duration-300 ease-in-out shrink-0",
+          collapsed ? "w-17" : "w-60"
         )}
       >
         <SidebarInner
@@ -68,7 +70,7 @@ export function AdminSidebar({
       {/* ── Mobile drawer ────────────────────────────────────────────────── */}
       <aside
         className={cn(
-          "lg:hidden fixed inset-y-0 left-0 z-30 flex flex-col w-[240px] bg-[#1B2847] text-white",
+          "lg:hidden fixed inset-y-0 left-0 z-30 flex flex-col w-60 bg-[#1B2847] text-white",
           "transition-transform duration-300 ease-in-out",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
@@ -107,9 +109,9 @@ function SidebarInner({
   return (
     <div className="flex flex-col h-full">
       {/* Logo / brand */}
-      <div className={cn("flex items-center gap-3 px-4 h-16 border-b border-white/10 flex-shrink-0", collapsed && "justify-center px-0")}>
+      <div className={cn("flex items-center gap-3 px-4 h-16 border-b border-white/10 shrink-0", collapsed && "justify-center px-0")}>
         {/* Japan torii gate icon (SVG mark) */}
-        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#C41230] flex items-center justify-center shadow-sm">
+        <div className="shrink-0 w-8 h-8 rounded-lg bg-[#C41230] flex items-center justify-center shadow-sm">
           <span className="text-white font-bold text-xs">JT</span>
         </div>
         {!collapsed && (
@@ -130,23 +132,23 @@ function SidebarInner({
             className={cn(
               "flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-medium transition-all duration-150 group",
               isActive(href)
-                ? "bg-white/10 text-white border-l-2 border-[#C41230] pl-[9px]"
+                ? "bg-white/10 text-white border-l-2 border-[#C41230] pl-2.25"
                 : "text-white/60 hover:text-white hover:bg-white/8",
               collapsed && "justify-center px-0 border-l-0 pl-0 w-10 mx-auto"
             )}
           >
-            <Icon className={cn("flex-shrink-0 w-4.5 h-4.5", isActive(href) ? "text-[#C41230]" : "text-white/60 group-hover:text-white")} size={18} />
+            <Icon className={cn("shrink-0 w-4.5 h-4.5", isActive(href) ? "text-[#C41230]" : "text-white/60 group-hover:text-white")} size={18} />
             {!collapsed && <span>{label}</span>}
           </Link>
         ))}
       </nav>
 
       {/* User + sign out */}
-      <div className="flex-shrink-0 border-t border-white/10 p-3 space-y-1">
+      <div className="shrink-0 border-t border-white/10 p-3 space-y-1">
         {/* User info */}
         {!collapsed && (
           <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg">
-            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#C41230] flex items-center justify-center text-xs font-semibold text-white">
+            <div className="shrink-0 w-7 h-7 rounded-full bg-[#C41230] flex items-center justify-center text-xs font-semibold text-white">
               {getInitials(user.name ?? user.email ?? "A")}
             </div>
             <div className="min-w-0 flex-1">
@@ -166,7 +168,7 @@ function SidebarInner({
             )}
             title={collapsed ? "Sign out" : undefined}
           >
-            <LogOut size={16} className="flex-shrink-0" />
+            <LogOut size={16} className="shrink-0" />
             {!collapsed && "Sign out"}
           </button>
         </form>

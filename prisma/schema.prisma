@@ -366,6 +366,37 @@ enum DiscountType {
 }
 
 // ─────────────────────────────────────────────
+// DESTINATIONS & PLACES
+// ─────────────────────────────────────────────
+
+model Destination {
+  id        String   @id @default(cuid())
+  name      String   // "Japan", "Europe"
+  slug      String   @unique
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  places Place[]
+}
+
+model Place {
+  id            String      @id @default(cuid())
+  destinationId String
+  name          String      // "Tokyo"
+  subtitle      String?     // "Attraction in Tokyo, Japan"
+  imageUrl      String?
+  linkQuery     String?     // e.g. "Tokyo" — appended as /tours?q=Tokyo
+  order         Int         @default(0)
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  destination Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@index([destinationId])
+}
+
+// ─────────────────────────────────────────────
 // CHAT
 // ─────────────────────────────────────────────
 

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
     "lint": "eslint",
     "postinstall": "prisma generate"
   },
@@ -29,6 +29,7 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.72.1",
     "react-leaflet": "^5.0.0",
+    "recharts": "^3.8.1",
     "sharp": "^0.34.5",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",

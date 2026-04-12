@@ -263,67 +263,108 @@ export default async function TourDetailPage({ params }: PageProps) {
               </section>
             )}
 
-            {/* Itinerary — clean vertical timeline */}
+            {/* Itinerary — GYG-style vertical timeline */}
             {itinerary.length > 0 && (
               <section>
-                <h2 className="text-2xl font-bold font-display text-[#111] mb-8">Itinerary</h2>
-                <div className="relative pl-10 space-y-0">
-                  {/* Vertical line */}
-                  <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-[#E4E0D9]" />
+                <h2 className="text-2xl font-bold font-display text-[#111] mb-2">Itinerary</h2>
+                <p className="text-sm text-[#7A746D] mb-8">For reference only. Itineraries are subject to change.</p>
 
+                <div className="relative">
+                  {/* ── Vertical spine line ── */}
+                  <div className="absolute left-5 top-5 bottom-5 w-0.5 bg-[#C41230]" />
+
+                  {/* ── Start node: Meeting Point ── */}
+                  <div className="relative flex items-start gap-5 pb-8">
+                    <div className="relative z-10 w-10 h-10 rounded-full bg-[#C41230] flex items-center justify-center shrink-0 shadow-md">
+                      <MapPin className="size-5 text-white" />
+                    </div>
+                    <div className="pt-1.5">
+                      <p className="text-xs font-bold text-[#C41230] uppercase tracking-widest mb-0.5">Start point</p>
+                      <p className="font-bold text-[#111] text-base">{tourData.meetingPoint}</p>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tourData.meetingPoint)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-[#C41230] hover:underline mt-1"
+                      >
+                        <MapPin className="size-3" />
+                        Open in Google Maps
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* ── Itinerary stops ── */}
                   {itinerary.map((stop, i) => (
-                    <div key={i} className={`relative pb-8 last:pb-0 ${stop.isOptional ? "opacity-60" : ""}`}>
-                      {/* Step circle — always anchored to the line */}
-                      <div className={`absolute flex items-center justify-center font-bold text-sm z-10 transition-colors rounded-full bg-white
+                    <div
+                      key={i}
+                      className={`relative flex items-start gap-5 pb-8 ${stop.isOptional ? "opacity-55" : ""}`}
+                    >
+                      {/* Icon circle */}
+                      <div className={`relative z-10 shrink-0 flex items-center justify-center rounded-full shadow
                         ${stop.isOptional
-                          ? "-left-5 w-7 h-7 border-2 border-dashed border-[#A8A29E] text-[#A8A29E]"
-                          : "-left-6 w-9 h-9 border-4 border-[#1B2847] text-[#1B2847] hover:border-[#C41230] hover:text-[#C41230]"
+                          ? "w-8 h-8 mt-1 bg-white border-2 border-dashed border-[#A8A29E]"
+                          : "w-10 h-10 bg-[#1B2847]"
                         }`}>
-                        {stop.order}
+                        <MapPin className={`${stop.isOptional ? "size-4 text-[#A8A29E]" : "size-5 text-white"}`} />
                       </div>
 
-                      {/* Card — optional ones are indented further */}
-                      <div className={`p-6 rounded-2xl border shadow-sm
-                        ${stop.isOptional
-                          ? "ml-10 bg-[#FAFAFA] border-dashed border-[#D6D3CF]"
-                          : "ml-4 bg-white border-[#E4E0D9]"
-                        }`}>
-                        <div className="flex justify-between items-start mb-2 gap-4">
-                          <h3 className={`text-xl font-bold ${stop.isOptional ? "text-[#6B7280]" : "text-[#111]"}`}>{stop.title}</h3>
+                      {/* Content */}
+                      <div className={`flex-1 pt-1.5 ${stop.isOptional ? "ml-1" : ""}`}>
+                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                          <h3 className={`font-bold text-base leading-snug ${stop.isOptional ? "text-[#6B7280]" : "text-[#111]"}`}>
+                            {stop.title}
+                          </h3>
                           {stop.isOptional && (
-                            <span className="text-xs bg-[#F3F4F6] text-[#9CA3AF] border border-dashed border-[#D1D5DB] font-semibold px-2 py-1 rounded-md shrink-0 italic">Optional</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF] border border-dashed border-[#D1D5DB] px-2 py-0.5 rounded-full italic">
+                              Optional
+                            </span>
                           )}
                         </div>
-                        <p className="text-[#545454] mb-4">{stop.description}</p>
-                        <div className="flex items-center gap-1.5 text-sm font-medium text-[#7A746D]">
-                          <Clock className="size-4" /> {stop.stayMinutes} min at this stop
-                        </div>
+                        {stop.description && (
+                          <p className="text-sm text-[#545454] mb-1.5 leading-relaxed">{stop.description}</p>
+                        )}
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-[#7A746D]">
+                          <Clock className="size-3.5" />
+                          {stop.stayMinutes} minutes
+                        </span>
                       </div>
+
+                      {/* Connector dots between stops */}
+                      {i < itinerary.length - 1 && !stop.isOptional && (
+                        <div className="absolute left-5 bottom-2 flex flex-col items-center gap-1 -translate-x-1/2">
+                          <span className="w-1 h-1 rounded-full bg-[#C41230] opacity-60" />
+                          <span className="w-1 h-1 rounded-full bg-[#C41230] opacity-40" />
+                          <span className="w-1 h-1 rounded-full bg-[#C41230] opacity-20" />
+                        </div>
+                      )}
                     </div>
                   ))}
+
+                  {/* ── End node: End Point or same as start ── */}
+                  <div className="relative flex items-start gap-5">
+                    <div className="relative z-10 w-10 h-10 rounded-full bg-[#C41230] flex items-center justify-center shrink-0 shadow-md">
+                      <MapPin className="size-5 text-white" />
+                    </div>
+                    <div className="pt-1.5">
+                      <p className="text-xs font-bold text-[#C41230] uppercase tracking-widest mb-0.5">Finish point</p>
+                      <p className="font-bold text-[#111] text-base">{tourData.endPoint || tourData.meetingPoint}</p>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tourData.endPoint || tourData.meetingPoint)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-[#C41230] hover:underline mt-1"
+                      >
+                        <MapPin className="size-3" />
+                        Open in Google Maps
+                      </a>
+                      {!tourData.endPoint && (
+                        <p className="text-xs text-[#7A746D] mt-0.5">Returns to start point</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </section>
             )}
-
-            {/* Meeting & End Point */}
-            <section className="grid md:grid-cols-2 gap-6 pt-8 border-t border-[#E4E0D9]">
-              <div className="bg-white p-6 rounded-2xl border border-[#E4E0D9] shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="size-5 text-[#C41230]" />
-                  <h3 className="text-lg font-bold font-display text-[#111]">Meeting Point</h3>
-                </div>
-                <p className="text-[#545454]">{tourData.meetingPoint}</p>
-              </div>
-              {tourData.endPoint && (
-                <div className="bg-white p-6 rounded-2xl border border-[#E4E0D9] shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <MapPin className="size-5 text-[#1B2847]" />
-                    <h3 className="text-lg font-bold font-display text-[#111]">End Point</h3>
-                  </div>
-                  <p className="text-[#545454]">{tourData.endPoint}</p>
-                </div>
-              )}
-            </section>
 
             {/* Photo Gallery Carousel */}
             {allImages.length > 1 && <GalleryCarousel images={allImages} />}
