@@ -264,6 +264,49 @@ export async function setPrimaryImageAction(imageId: string, tourId: string): Pr
   }
 }
 
+// ── Duplicate Tour ───────────────────────────────────────────────────────────
+
+export async function duplicateTourAction(tourId: string): Promise<ActionResult> {
+  await assertAdmin();
+  try {
+    const original = await prisma.tour.findUnique({ where: { id: tourId } });
+    if (!original) return { error: "Tour not found." };
+
+    // Build a unique slug
+    let newSlug = original.slug + "-copy";
+    let counter = 1;
+    while (await prisma.tour.findUnique({ where: { slug: newSlug } })) {
+      newSlug = original.slug + "-copy-" + counter++;
+    }
+
+    const { id: _id, createdAt: _ca, updatedAt: _ua, slug: _sl, title: _ti, status: _st, rating: _ra, reviewCount: _rc, ...rest } = original;
+
+    const newTour = await prisma.tour.create({
+      data: {
+        ...(rest as any),
+        title:       original.title + " (Copy)",
+        slug:        newSlug,
+        status:      "DRAFT",
+        featured:    false,
+        rating:      0,
+        reviewCount: 0,
+      },
+    });
+
+    // Clone images
+    const images = await prisma.tourImage.findMany({ where: { tourId }, orderBy: { order: "asc" } });
+    for (const img of images) {
+      const { id: _iid, tourId: _tid, ...imgRest } = img;
+      await prisma.tourImage.create({ data: { ...imgRest, tourId: newTour.id } });
+    }
+
+    revalidatePath("/admin/tours");
+    return { success: "Tour duplicated.", tourId: newTour.id };
+  } catch (e: any) {
+    return { error: `Failed to duplicate: ${e.message || String(e)}` };
+  }
+}
+
 // ── Availability ─────────────────────────────────────────────────────────────
 
 export async function saveAvailabilityAction(formData: FormData): Promise<ActionResult> {

@@ -32,6 +32,9 @@ export async function POST(req: NextRequest) {
       });
       if (!booking) break;
 
+      // Idempotency guard — Stripe can deliver the same event more than once
+      if (booking.paymentStatus === "PAID") break;
+
       await prisma.booking.update({
         where: { bookingRef },
         data: {
@@ -43,13 +46,8 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Update availability count
-      if (booking.availabilityId) {
-        await prisma.tourAvailability.update({
-          where: { id: booking.availabilityId },
-          data:  { bookedCount: { increment: booking.numAdults + booking.numChildren } },
-        });
-      }
+      // Note: bookedCount is incremented atomically during booking creation.
+      // No second increment here.
 
       // Send confirmation email
       const recipientName = booking.guestName ?? booking.customer?.name ?? "Traveller";

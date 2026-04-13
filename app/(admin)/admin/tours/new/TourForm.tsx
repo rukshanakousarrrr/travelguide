@@ -4,8 +4,8 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft, ChevronRight, Check, Save, MapPin, FileText,
-  List, Route, Truck, DollarSign, Image, Search as SearchIcon,
-  Plus, X, GripVertical, AlertCircle
+  Route, Truck, DollarSign, Image as ImageIcon, Search as SearchIcon,
+  Plus, X, AlertCircle
 } from "lucide-react";
 import { slugify } from "@/lib/utils";
 import { TOUR_CATEGORIES } from "@/lib/constants";
@@ -70,7 +70,7 @@ type TourData = {
 const STEPS = [
   { id: "basics",      label: "Basics",      icon: MapPin     },
   { id: "description", label: "Description", icon: FileText   },
-  { id: "media",       label: "Media",       icon: Image      },
+  { id: "media",       label: "Media",       icon: ImageIcon  },
   { id: "itinerary",   label: "Itinerary",   icon: Route      },
   { id: "logistics",   label: "Logistics",   icon: Truck      },
   { id: "pricing",     label: "Pricing",     icon: DollarSign },
@@ -86,7 +86,7 @@ const DEFAULT_DATA: TourData = {
   meetingPoint: "", endPoint: "", duration: "1", durationType: "days", maxGroupSize: "10",
   minGroupSize: "1", dailyCapacity: "10", languages: ["English"], serviceProvider: "",
   basePrice: "", childPrice: "", priceTiers: [], includes: [""], excludes: [""], importantInfo: [""],
-  coverImage: "", galleryImages: ["", "", ""],
+  coverImage: "", galleryImages: ["", "", "", ""],
   metaTitle: "", metaDescription: "", featured: false, likelyToSellOut: false, status: "DRAFT",
 };
 
@@ -320,7 +320,7 @@ export function TourForm({ initialData }: TourFormProps) {
               <div className="space-y-2">
                 {data.highlights.map((h, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="text-xs text-[#A8A29E] w-5 text-center flex-shrink-0">{i + 1}</span>
+                    <span className="text-xs text-[#A8A29E] w-5 text-center shrink-0">{i + 1}</span>
                     <input className={inputCls} value={h} onChange={(e) => updateList("highlights", i, e.target.value)} placeholder="e.g. Visit a 400-year-old temple" />
                     {data.highlights.length > 1 && (
                       <button type="button" onClick={() => removeListItem("highlights", i)} className="p-1.5 text-[#A8A29E] hover:text-[#DC2626] transition-colors"><X size={14} /></button>
@@ -342,7 +342,7 @@ export function TourForm({ initialData }: TourFormProps) {
             <div>
               <label className={labelCls}>Cover Image <span className="text-[#C41230]">*</span></label>
               <div className="mt-2 border-2 border-dashed border-[#E4E0D9] rounded-xl p-8 text-center hover:bg-[#FAFAFA] transition-colors">
-                <Image className="mx-auto text-[#A8A29E] mb-3" size={32} />
+                <ImageIcon className="mx-auto text-[#A8A29E] mb-3" size={32} />
                 <p className="text-sm font-medium text-[#111]">Upload Cover Image</p>
                 <p className="text-xs text-[#A8A29E] mt-1">This will be the main photo shown on listings and the detail page hero.</p>
                 <input type="file" className="block w-full max-w-xs mx-auto mt-4 text-xs text-[#7A746D] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#1B2847] file:text-white file:text-xs file:font-semibold hover:file:bg-[#2A3B66] cursor-pointer" accept="image/*" />
@@ -350,14 +350,17 @@ export function TourForm({ initialData }: TourFormProps) {
             </div>
 
             <div>
-              <label className={labelCls}>Gallery Images <span className="text-[#A8A29E] font-normal">(add as many as you like)</span></label>
+              <label className={labelCls}>
+                Gallery Images
+                <span className="text-[#A8A29E] font-normal"> (min 4 · max 15)</span>
+              </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
                 {data.galleryImages.map((_, i) => (
-                  <div key={i} className="border-2 border-dashed border-[#E4E0D9] rounded-xl p-5 text-center hover:bg-[#FAFAFA] transition-colors relative flex flex-col items-center justify-center min-h-[140px] group">
-                    <Image className="text-[#E4E0D9] mb-2" size={24} />
+                  <div key={i} className="border-2 border-dashed border-[#E4E0D9] rounded-xl p-5 text-center hover:bg-[#FAFAFA] transition-colors relative flex flex-col items-center justify-center min-h-35 group">
+                    <ImageIcon className="text-[#E4E0D9] mb-2" size={24} />
                     <p className="text-xs font-medium text-[#7A746D]">Image {i + 1}</p>
                     <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" />
-                    {data.galleryImages.length > 1 && (
+                    {data.galleryImages.length > 4 && (
                       <button
                         type="button"
                         onClick={() => update("galleryImages", data.galleryImages.filter((_, idx) => idx !== i))}
@@ -369,17 +372,24 @@ export function TourForm({ initialData }: TourFormProps) {
                     )}
                   </div>
                 ))}
-                {/* Add more button */}
-                <button
-                  type="button"
-                  onClick={() => update("galleryImages", [...data.galleryImages, ""])}
-                  className="border-2 border-dashed border-[#C41230]/30 rounded-xl p-5 flex flex-col items-center justify-center min-h-[140px] text-[#C41230] hover:bg-[#FFF5F5] transition-colors cursor-pointer"
-                >
-                  <Plus className="mb-2" size={24} />
-                  <p className="text-xs font-semibold">Add Image Slot</p>
-                </button>
+                {/* Add more button — hidden once 15 slots reached */}
+                {data.galleryImages.length < 15 && (
+                  <button
+                    type="button"
+                    onClick={() => update("galleryImages", [...data.galleryImages, ""])}
+                    className="border-2 border-dashed border-[#C41230]/30 rounded-xl p-5 flex flex-col items-center justify-center min-h-35 text-[#C41230] hover:bg-[#FFF5F5] transition-colors cursor-pointer"
+                  >
+                    <Plus className="mb-2" size={24} />
+                    <p className="text-xs font-semibold">Add Image Slot</p>
+                    <p className="text-[10px] text-[#A8A29E] mt-1">{data.galleryImages.length} / 15</p>
+                  </button>
+                )}
               </div>
-              <p className={hintCls}>Upload additional images to showcase the full tour experience. The more the better!</p>
+              <p className={hintCls}>
+                {data.galleryImages.length < 4
+                  ? `At least 4 photos required — add ${4 - data.galleryImages.length} more.`
+                  : `${data.galleryImages.length} of 15 slots used. More photos = higher conversion.`}
+              </p>
             </div>
           </div>
         );
@@ -397,7 +407,7 @@ export function TourForm({ initialData }: TourFormProps) {
             <div className="relative">
               {/* Vertical line */}
               {data.itinerary.length > 1 && (
-                <div className="absolute left-[15px] top-8 bottom-8 w-0.5 bg-[#E4E0D9]" />
+                <div className="absolute left-3.75 top-8 bottom-8 w-0.5 bg-[#E4E0D9]" />
               )}
 
               <div className="space-y-3">
@@ -428,7 +438,7 @@ export function TourForm({ initialData }: TourFormProps) {
                             <span className="px-2 py-0.5 rounded-full bg-[#F1EFE9] text-[#7A746D] text-[10px] font-medium">⏱ {formatStayTime(stop.stayMinutes)}</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <div className="flex items-center gap-0.5 shrink-0">
                           <button type="button" onClick={() => moveStop(i, -1)} disabled={i === 0} className="p-1 text-[#A8A29E] hover:text-[#111] disabled:opacity-30 transition-colors" title="Move up"><ChevronLeft size={14} className="rotate-90" /></button>
                           <button type="button" onClick={() => moveStop(i, 1)} disabled={i === data.itinerary.length - 1} className="p-1 text-[#A8A29E] hover:text-[#111] disabled:opacity-30 transition-colors" title="Move down"><ChevronRight size={14} className="rotate-90" /></button>
                           {data.itinerary.length > 1 && (
@@ -498,7 +508,7 @@ export function TourForm({ initialData }: TourFormProps) {
                   <option value="days">Days</option>
                 </select>
               </div>
-              <p className="text-[10px] text-[#A8A29E] mt-1">Total tour length — e.g. "4 hours" or "3 days"</p>
+              <p className="text-[10px] text-[#A8A29E] mt-1">Total tour length — e.g. &quot;4 hours&quot; or &quot;3 days&quot;</p>
             </div>
             <div>
               <label className={labelCls}>Max Group Size</label>
@@ -537,7 +547,7 @@ export function TourForm({ initialData }: TourFormProps) {
                 ))}
                 <input
                   type="text"
-                  className="flex-1 min-w-[120px] h-7 text-sm text-[#111] placeholder:text-[#A8A29E] focus:outline-none bg-transparent"
+                  className="flex-1 min-w-30 h-7 text-sm text-[#111] placeholder:text-[#A8A29E] focus:outline-none bg-transparent"
                   placeholder={data.languages.length === 0 ? "Type a language (e.g. English) and press Enter" : "Add another..."}
                   value={langInput}
                   onChange={(e) => setLangInput(e.target.value)}
@@ -640,7 +650,7 @@ export function TourForm({ initialData }: TourFormProps) {
               <div className="space-y-2">
                 {data.includes.map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="text-[#15803D] flex-shrink-0 text-sm">✓</span>
+                    <span className="text-[#15803D] shrink-0 text-sm">✓</span>
                     <input className={inputCls} value={item} onChange={(e) => updateList("includes", i, e.target.value)} placeholder="e.g. Professional English-speaking guide" />
                     {data.includes.length > 1 && (
                       <button type="button" onClick={() => removeListItem("includes", i)} className="p-1.5 text-[#A8A29E] hover:text-[#DC2626]"><X size={14} /></button>
@@ -655,7 +665,7 @@ export function TourForm({ initialData }: TourFormProps) {
               <div className="space-y-2">
                 {data.excludes.map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="text-[#DC2626] flex-shrink-0 text-sm">✕</span>
+                    <span className="text-[#DC2626] shrink-0 text-sm">✕</span>
                     <input className={inputCls} value={item} onChange={(e) => updateList("excludes", i, e.target.value)} placeholder="e.g. Hotel pickup and drop-off" />
                     {data.excludes.length > 1 && (
                       <button type="button" onClick={() => removeListItem("excludes", i)} className="p-1.5 text-[#A8A29E] hover:text-[#DC2626]"><X size={14} /></button>
@@ -697,7 +707,7 @@ export function TourForm({ initialData }: TourFormProps) {
                   onClick={() => update("featured", !data.featured)}
                   className={`relative w-10 h-6 rounded-full transition-colors ${data.featured ? "bg-[#C41230]" : "bg-[#E4E0D9]"}`}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${data.featured ? "left-[18px]" : "left-0.5"}`} />
+                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${data.featured ? "left-4.5" : "left-0.5"}`} />
                 </button>
                 <div>
                   <p className="text-sm font-medium text-[#111]">Featured Tour</p>
@@ -711,7 +721,7 @@ export function TourForm({ initialData }: TourFormProps) {
                   onClick={() => update("likelyToSellOut", !data.likelyToSellOut)}
                   className={`relative w-10 h-6 rounded-full transition-colors ${data.likelyToSellOut ? "bg-[#C41230]" : "bg-[#E4E0D9]"}`}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${data.likelyToSellOut ? "left-[18px]" : "left-0.5"}`} />
+                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${data.likelyToSellOut ? "left-4.5" : "left-0.5"}`} />
                 </button>
                 <div>
                   <p className="text-sm font-medium text-[#111]">Likely to Sell Out Badge</p>
@@ -739,7 +749,7 @@ export function TourForm({ initialData }: TourFormProps) {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Step indicator */}
-      <div className="bg-white rounded-xl border border-[#E4E0D9] shadow-[var(--shadow-card)] p-4 mb-5">
+      <div className="bg-white rounded-xl border border-[#E4E0D9] shadow-(--shadow-card) p-4 mb-5">
         <div className="flex items-center gap-1 overflow-x-auto">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
@@ -766,7 +776,7 @@ export function TourForm({ initialData }: TourFormProps) {
       </div>
 
       {/* Form content */}
-      <div className="bg-white rounded-xl border border-[#E4E0D9] shadow-[var(--shadow-card)] p-6">
+      <div className="bg-white rounded-xl border border-[#E4E0D9] shadow-(--shadow-card) p-6">
         {/* Error / success */}
         {result.error && (
           <div className="mb-5 flex items-center gap-2 px-4 py-3 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/20 text-[#DC2626] text-sm animate-fade-in">

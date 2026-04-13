@@ -92,6 +92,44 @@ export async function bulkUpsertAvailability(
   return { success: true, count: dates.length };
 }
 
+/**
+ * Close (or set any status on) every occurrence of a given weekday within a
+ * calendar month. E.g. close all Mondays in May 2026.
+ *
+ * @param weekday  0 = Sunday … 6 = Saturday (JS convention)
+ * @param year     full year, e.g. 2026
+ * @param month    0-based month index (0 = January)
+ */
+export async function bulkCloseWeekday(
+  tourId: string,
+  weekday: number,
+  year: number,
+  month: number,
+  status: "AVAILABLE" | "FULL" | "CLOSED" | "CANCELLED" = "CLOSED",
+  maxCapacity: number
+) {
+  await assertAdmin();
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const dates: Date[] = [];
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(Date.UTC(year, month, d));
+    if (date.getUTCDay() === weekday) dates.push(date);
+  }
+
+  for (const date of dates) {
+    await prisma.tourAvailability.upsert({
+      where:  { tourId_date: { tourId, date } },
+      create: { tourId, date, status, maxCapacity, priceOverride: null, startTime: null },
+      update: { status, maxCapacity },
+    });
+  }
+
+  revalidatePath(`/admin/tours/${tourId}/availability`);
+  return { success: true, count: dates.length };
+}
+
 /** Delete a single availability record by id. */
 export async function deleteAvailability(tourId: string, availId: string) {
   await assertAdmin();

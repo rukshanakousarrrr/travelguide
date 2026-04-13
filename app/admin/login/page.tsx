@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
           {/* Error */}
           {error && (
             <div className="mb-5 flex items-center gap-2 px-4 py-3 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] text-sm animate-fade-in">
-              <Lock className="w-4 h-4 flex-shrink-0" />
+              <Lock className="w-4 h-4 shrink-0" />
               {error}
             </div>
           )}

@@ -115,7 +115,7 @@ export function GalleryCarousel({ images }: { images: TourImage[] }) {
               {images.map((img, i) => (
                 <div
                   key={i}
-                  className="flex-shrink-0 w-full aspect-[16/9] relative cursor-pointer"
+                  className="shrink-0 w-full aspect-[16/9] relative cursor-pointer"
                   onClick={() => { setLightboxOpen(true); }}
                 >
                   <img src={img.url} alt={img.altText || `Gallery photo ${i + 1}`} className="w-full h-full object-cover" />

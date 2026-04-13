@@ -34,7 +34,7 @@ export function AdminHeader({ onMobileMenuClick, user }: AdminHeaderProps) {
   const pageTitle = crumbs[crumbs.length - 1]?.label ?? "Dashboard";
 
   return (
-    <header className="flex-shrink-0 h-16 bg-white border-b border-[#E4E0D9] flex items-center gap-4 px-4 lg:px-6">
+    <header className="shrink-0 h-16 bg-white border-b border-[#E4E0D9] flex items-center gap-4 px-4 lg:px-6">
       {/* Mobile menu toggle */}
       <button
         onClick={onMobileMenuClick}
@@ -50,7 +50,7 @@ export function AdminHeader({ onMobileMenuClick, user }: AdminHeaderProps) {
           <nav className="flex items-center gap-1 text-sm" aria-label="Breadcrumb">
             {crumbs.map((crumb, i) => (
               <span key={crumb.href} className="flex items-center gap-1">
-                {i > 0 && <ChevronRight className="w-3.5 h-3.5 text-[#A8A29E] flex-shrink-0" />}
+                {i > 0 && <ChevronRight className="w-3.5 h-3.5 text-[#A8A29E] shrink-0" />}
                 <span
                   className={cn(
                     "truncate",
@@ -73,7 +73,7 @@ export function AdminHeader({ onMobileMenuClick, user }: AdminHeaderProps) {
       <div className="flex items-center gap-2">
         {/* Search (hidden on small screens) */}
         <div className="hidden md:flex items-center gap-2 h-9 px-3 rounded-lg bg-[#F8F7F5] border border-[#E4E0D9] text-sm text-[#A8A29E] cursor-pointer hover:bg-[#F1EFE9] transition-colors min-w-[200px]">
-          <Search className="w-3.5 h-3.5 flex-shrink-0" />
+          <Search className="w-3.5 h-3.5 shrink-0" />
           <span>Search…</span>
           <kbd className="ml-auto text-[10px] font-mono bg-white border border-[#E4E0D9] rounded px-1 py-0.5 text-[#A8A29E]">⌘K</kbd>
         </div>

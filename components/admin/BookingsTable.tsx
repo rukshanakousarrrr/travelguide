@@ -6,7 +6,7 @@ import {
   Search, X, ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
   Clock, CheckCircle2, XCircle, AlertCircle,
   CreditCard, Banknote, Users, Calendar, Mail, Phone,
-  FileText, StickyNote, Check, MapPin, Ticket,
+  FileText, StickyNote, Check, MapPin, Ticket, Download,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import {
@@ -421,6 +421,20 @@ export function BookingsTable({
           </button>
         )}
         <p className="text-xs text-[#A8A29E] ml-auto">{total.toLocaleString()} result{total !== 1 ? "s" : ""}</p>
+        <a
+          href={
+            "/api/admin/bookings/export?" +
+            new URLSearchParams([
+              ...(query   ? [["q",       query  ]] : []),
+              ...(status  !== "ALL" ? [["status",  status ]] : []),
+              ...(payment !== "ALL" ? [["payment", payment]] : []),
+            ]).toString()
+          }
+          download
+          className="flex items-center gap-1.5 text-xs font-semibold text-white bg-[#1B2847] hover:bg-[#243560] px-3 py-2 rounded-lg transition-colors"
+        >
+          <Download className="size-3.5" /> Export CSV
+        </a>
       </div>
 
       {/* Card list */}

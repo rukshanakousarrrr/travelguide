@@ -56,7 +56,7 @@ export function CreateUserModal({ onClose }: { onClose: () => void }) {
           {/* Error */}
           {state.error && (
             <div className="mb-4 flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/20 text-[#DC2626] text-sm">
-              <span className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold">!</span>
+              <span className="shrink-0 w-4 h-4 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold">!</span>
               {state.error}
             </div>
           )}

@@ -82,7 +82,7 @@ function SearchableSelect({
             : "border-[#E4E0D9] bg-white hover:border-[#C8C4BB]"
         }`}
       >
-        <Icon size={14} className="text-[#A8A29E] flex-shrink-0" />
+        <Icon size={14} className="text-[#A8A29E] shrink-0" />
         <span className={`flex-1 truncate ${selectedLabel ? "text-[#111]" : "text-[#A8A29E]"}`}>
           {selectedLabel || placeholder}
         </span>

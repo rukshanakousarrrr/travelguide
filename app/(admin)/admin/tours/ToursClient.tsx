@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import {
   Plus, Search, MoreHorizontal, Eye, Pencil, Trash2, Star, StarOff,
   Map, Clock, Users, CheckCircle2, Archive, FileText,
-  Globe, EyeOff
+  Globe, EyeOff, Copy
 } from "lucide-react";
 import { formatPrice, getInitials } from "@/lib/utils";
 import { TOUR_CATEGORIES } from "@/lib/constants";
-import { deleteTourAction, toggleTourStatusAction, toggleFeaturedAction } from "./actions";
+import { deleteTourAction, toggleTourStatusAction, toggleFeaturedAction, duplicateTourAction } from "./actions";
 
 type TourRow = {
   id: string;
@@ -85,7 +85,7 @@ export function ToursClient({ tours }: { tours: TourRow[] }) {
         </div>
         <Link
           href="/admin/tours/new"
-          className="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#C41230] text-white text-sm font-semibold hover:bg-[#A00E25] active:scale-[0.98] transition-all shadow-sm flex-shrink-0"
+          className="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#C41230] text-white text-sm font-semibold hover:bg-[#A00E25] active:scale-[0.98] transition-all shadow-sm shrink-0"
         >
           <Plus size={15} />
           New Tour
@@ -114,10 +114,10 @@ export function ToursClient({ tours }: { tours: TourRow[] }) {
       </div>
 
       {/* Table card */}
-      <div className="bg-white rounded-xl border border-[#E4E0D9] shadow-[var(--shadow-card)] overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E4E0D9] shadow-(--shadow-card) overflow-hidden">
         {/* Toolbar */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-[#E4E0D9] flex-wrap">
-          <div className="relative flex-1 min-w-[200px] max-w-xs">
+          <div className="relative flex-1 min-w-50 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A8A29E]" />
             <input
               value={query}
@@ -185,7 +185,7 @@ export function ToursClient({ tours }: { tours: TourRow[] }) {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <div
-                            className="flex-shrink-0 w-12 h-12 rounded-lg bg-[#F1EFE9] flex items-center justify-center overflow-hidden"
+                            className="shrink-0 w-12 h-12 rounded-lg bg-[#F1EFE9] flex items-center justify-center overflow-hidden"
                           >
                             {tour.images[0] ? (
                               <img
@@ -201,12 +201,12 @@ export function ToursClient({ tours }: { tours: TourRow[] }) {
                             <div className="flex items-center gap-1.5">
                               <Link
                                 href={`/admin/tours/${tour.id}`}
-                                className="font-medium text-[#111] hover:text-[#C41230] transition-colors truncate max-w-[280px] block"
+                                className="font-medium text-[#111] hover:text-[#C41230] transition-colors truncate max-w-70 block"
                               >
                                 {tour.title}
                               </Link>
                               {tour.featured && (
-                                <Star size={12} className="text-[#C8A84B] fill-[#C8A84B] flex-shrink-0" />
+                                <Star size={12} className="text-[#C8A84B] fill-[#C8A84B] shrink-0" />
                               )}
                             </div>
                             <p className="text-xs text-[#7A746D] truncate">{tour.location}</p>
@@ -282,6 +282,12 @@ export function ToursClient({ tours }: { tours: TourRow[] }) {
                               >
                                 {tour.featured ? <StarOff size={14} /> : <Star size={14} />}
                                 {tour.featured ? "Remove featured" : "Set as featured"}
+                              </button>
+                              <button
+                                onClick={() => handleAction(() => duplicateTourAction(tour.id))}
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-sm text-[#111] hover:bg-[#F8F7F5] text-left"
+                              >
+                                <Copy size={14} /> Duplicate
                               </button>
                               <div className="h-px bg-[#E4E0D9] my-1" />
                               {tour.status !== "PUBLISHED" && (

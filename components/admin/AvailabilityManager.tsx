@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useTransition } from "react";
-import { ChevronLeft, ChevronRight, X, Plus, Trash2, CalendarDays, RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Plus, Trash2, CalendarDays, RefreshCw, Ban } from "lucide-react";
 import {
   upsertAvailability,
   bulkUpsertAvailability,
+  bulkCloseWeekday,
   deleteAvailability,
 } from "@/app/(admin)/admin/tours/availability-actions";
 
@@ -63,6 +64,16 @@ export function AvailabilityManager({ tourId, dailyCapacity }: Props) {
     startDate: "", endDate: "", status: "AVAILABLE" as AvailStatus,
     maxCapacity: String(dailyCapacity), priceOverride: "", startTime: "",
     skipSun: false, skipSat: false,
+  });
+
+  // Close weekday state
+  const [showWeekday, setShowWeekday] = useState(false);
+  const [wdForm, setWdForm] = useState({
+    weekday:     "1",  // 0=Sun…6=Sat, default Monday
+    year:        String(today.getFullYear()),
+    month:       String(today.getMonth()),  // 0-based
+    status:      "CLOSED" as AvailStatus,
+    maxCapacity: String(dailyCapacity),
   });
 
   const [isPending, startTransition] = useTransition();
@@ -143,6 +154,21 @@ export function AvailabilityManager({ tourId, dailyCapacity }: Props) {
     });
   };
 
+  const saveWeekday = () => {
+    startTransition(async () => {
+      await bulkCloseWeekday(
+        tourId,
+        Number(wdForm.weekday),
+        Number(wdForm.year),
+        Number(wdForm.month),
+        wdForm.status,
+        Number(wdForm.maxCapacity) || dailyCapacity,
+      );
+      await fetchMonth(year, month);
+      setShowWeekday(false);
+    });
+  };
+
   const inputCls = "w-full h-9 rounded-lg border border-[#E4E0D9] px-3 text-sm text-[#111] bg-white focus:outline-none focus:ring-2 focus:ring-[#C41230]/20 focus:border-[#C41230]";
   const labelCls = "text-xs font-semibold text-[#545454] block mb-1";
 
@@ -162,12 +188,20 @@ export function AvailabilityManager({ tourId, dailyCapacity }: Props) {
             <RefreshCw className="size-4" />
           </button>
         </div>
-        <button
-          onClick={() => setShowBulk(true)}
-          className="flex items-center gap-2 bg-[#1B2847] hover:bg-[#243560] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-        >
-          <CalendarDays className="size-4" /> Bulk Add Dates
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowBulk(true)}
+            className="flex items-center gap-2 bg-[#1B2847] hover:bg-[#243560] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+          >
+            <CalendarDays className="size-4" /> Bulk Add Dates
+          </button>
+          <button
+            onClick={() => setShowWeekday(true)}
+            className="flex items-center gap-2 bg-[#7A746D] hover:bg-[#5A5450] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+          >
+            <Ban className="size-4" /> Close Weekday
+          </button>
+        </div>
       </div>
 
       {/* ── Status legend ── */}
@@ -335,6 +369,87 @@ export function AvailabilityManager({ tourId, dailyCapacity }: Props) {
             >
               Cancel
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Close Weekday Modal ── */}
+      {showWeekday && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-bold text-[#111] text-lg">Close by Weekday</h3>
+              <button onClick={() => setShowWeekday(false)} className="p-1 rounded-md hover:bg-[#F8F7F5]">
+                <X className="size-5 text-[#7A746D]" />
+              </button>
+            </div>
+            <p className="text-xs text-[#7A746D] mb-4">
+              Set every occurrence of a weekday in a month to a chosen status.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Weekday</label>
+                <select value={wdForm.weekday} onChange={(e) => setWdForm((f) => ({ ...f, weekday: e.target.value }))} className={inputCls}>
+                  {["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].map((d, i) => (
+                    <option key={i} value={String(i)}>{d}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Month</label>
+                  <select value={wdForm.month} onChange={(e) => setWdForm((f) => ({ ...f, month: e.target.value }))} className={inputCls}>
+                    {MONTHS.map((m, i) => <option key={i} value={String(i)}>{m}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Year</label>
+                  <input
+                    type="number" min="2024" max="2030"
+                    value={wdForm.year}
+                    onChange={(e) => setWdForm((f) => ({ ...f, year: e.target.value }))}
+                    className={inputCls}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls}>Set Status</label>
+                <div className="flex gap-2 flex-wrap">
+                  {(["AVAILABLE","CLOSED","CANCELLED"] as AvailStatus[]).map((s) => (
+                    <button key={s}
+                      onClick={() => setWdForm((f) => ({ ...f, status: s }))}
+                      className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
+                        wdForm.status === s ? "border-[#C41230] bg-[#FFF0F2] text-[#C41230]" : "border-[#E4E0D9] text-[#545454]"
+                      }`}
+                    >{s}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls}>Max Capacity</label>
+                <input type="number" min="1" value={wdForm.maxCapacity}
+                  onChange={(e) => setWdForm((f) => ({ ...f, maxCapacity: e.target.value }))}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={saveWeekday}
+                disabled={isPending}
+                className="flex-1 bg-[#C41230] hover:bg-[#A00F27] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors"
+              >
+                {isPending ? "Applying…" : "Apply"}
+              </button>
+              <button onClick={() => setShowWeekday(false)} className="border border-[#E4E0D9] hover:bg-[#F8F7F5] text-[#7A746D] font-semibold py-3 px-5 rounded-xl transition-colors">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

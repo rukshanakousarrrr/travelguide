@@ -15,6 +15,7 @@ import {
   ChevronsLeft,
   X,
   Globe,
+  UserCheck,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import { signOutAction } from "@/app/(admin)/admin/actions";
@@ -24,6 +25,7 @@ const navItems = [
   { label: "Bookings",     href: "/admin/bookings",       icon: CalendarCheck   },
   { label: "Tours",        href: "/admin/tours",          icon: Map             },
   { label: "Destinations", href: "/admin/destinations",   icon: Globe           },
+  { label: "Customers",    href: "/admin/customers",      icon: UserCheck       },
   { label: "Users",        href: "/admin/users",          icon: Users           },
   { label: "Analytics",    href: "/admin/analytics",      icon: BarChart3       },
   { label: "Chat",         href: "/admin/chat",           icon: MessageSquare   },

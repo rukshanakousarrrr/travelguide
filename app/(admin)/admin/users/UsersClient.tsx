@@ -43,7 +43,7 @@ export function UsersClient({ users }: { users: UserRow[] }) {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#C41230] text-white text-sm font-semibold hover:bg-[#A00E25] active:scale-[0.98] transition-all shadow-sm flex-shrink-0"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#C41230] text-white text-sm font-semibold hover:bg-[#A00E25] active:scale-[0.98] transition-all shadow-sm shrink-0"
           >
             <UserPlus size={15} />
             New Account
@@ -104,7 +104,7 @@ export function UsersClient({ users }: { users: UserRow[] }) {
                     <tr key={user.id} className="hover:bg-[#F8F7F5] transition-colors">
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1B2847] flex items-center justify-center text-xs font-semibold text-white">
+                          <div className="shrink-0 w-8 h-8 rounded-full bg-[#1B2847] flex items-center justify-center text-xs font-semibold text-white">
                             {getInitials(user.name ?? user.email ?? "U")}
                           </div>
                           <div>
