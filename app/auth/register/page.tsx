@@ -1,40 +1,127 @@
 "use client";
 
 import { COMPANY_NAME } from "@/lib/constants";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, Mail, RefreshCw, CheckCircle } from "lucide-react";
 import { useState, useTransition } from "react";
-import { registerUserAction } from "./actions";
+import { registerUserAction, resendVerificationAction } from "./actions";
 import Link from "next/link";
 
 export default function RegisterPage() {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]            = useState<string | null>(null);
+  const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent">("idle");
 
-  async function handleSubmit(formData: FormData) {
+  function handleSubmit(formData: FormData) {
     setError(null);
     startTransition(async () => {
       const result = await registerUserAction(formData);
       if (result?.error) {
         setError(result.error);
+      } else if (result?.needsVerification) {
+        setVerifyEmail(result.email ?? null);
       }
     });
   }
 
+  function handleResend() {
+    if (!verifyEmail || resendState === "sending") return;
+    setResendState("sending");
+    startTransition(async () => {
+      await resendVerificationAction(verifyEmail);
+      setResendState("sent");
+      setTimeout(() => setResendState("idle"), 5000);
+    });
+  }
+
+  // ── Verification pending screen ──────────────────────────────────────────────
+  if (verifyEmail) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#F8F7F5] via-white to-[#F1EFE9] px-4 pt-24 pb-16">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-150 h-150 rounded-full bg-[#C41230]/5" />
+          <div className="absolute -bottom-40 -left-40 w-125 h-125 rounded-full bg-[#1B2847]/5" />
+        </div>
+
+        <div className="w-full max-w-lg relative z-10">
+          <div className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(228,224,217,0.8)] overflow-hidden">
+            <div className="h-1.5 bg-linear-to-r from-[#C41230] via-[#C8A84B] to-[#1B2847]" />
+
+            <div className="p-8 text-center">
+              {/* Icon */}
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#EEF4FF] mb-6">
+                <Mail className="w-10 h-10 text-[#1B2847]" />
+              </div>
+
+              <h1 className="text-2xl font-bold text-[#111111] mb-2" style={{ fontFamily: "var(--font-playfair)" }}>
+                Check your inbox
+              </h1>
+              <p className="text-[#7A746D] mb-6 leading-relaxed">
+                We've sent a verification link to<br />
+                <strong className="text-[#1B2847]">{verifyEmail}</strong>
+              </p>
+
+              {/* Info card */}
+              <div className="bg-[#F8F7F5] rounded-xl p-5 mb-6 text-left border border-[#E4E0D9]">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#1B7849] mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-[#111] mb-0.5">What to do next</p>
+                    <ol className="text-sm text-[#7A746D] space-y-1 list-decimal list-inside">
+                      <li>Open the email from {COMPANY_NAME}</li>
+                      <li>Click the "Verify My Email Address" button</li>
+                      <li>You'll be redirected to the sign-in page</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+
+              {/* Expiry note */}
+              <p className="text-xs text-[#A8A29E] mb-6">
+                The link expires in <strong>24 hours</strong>. Check your spam folder if you don't see it.
+              </p>
+
+              {/* Resend */}
+              <button
+                onClick={handleResend}
+                disabled={resendState !== "idle" || isPending}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[#1B2847] hover:text-[#C41230] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {resendState === "sending" ? (
+                  <><span className="w-4 h-4 border-2 border-[#1B2847]/30 border-t-[#1B2847] rounded-full animate-spin" /> Sending...</>
+                ) : resendState === "sent" ? (
+                  <><CheckCircle className="w-4 h-4 text-[#1B7849]" /> Email sent!</>
+                ) : (
+                  <><RefreshCw className="w-4 h-4" /> Resend verification email</>
+                )}
+              </button>
+
+              <p className="text-center text-sm text-[#7A746D] mt-8">
+                Already verified?{" "}
+                <Link href="/auth/login" className="font-semibold text-[#C41230] hover:underline">
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Registration form ────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8F7F5] via-white to-[#F1EFE9] px-4 pt-24 pb-16">
-      {/* Decorative background */}
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#F8F7F5] via-white to-[#F1EFE9] px-4 pt-24 pb-16">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#C41230]/5" />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-[#1B2847]/5" />
+        <div className="absolute -top-40 -right-40 w-150 h-150 rounded-full bg-[#C41230]/5" />
+        <div className="absolute -bottom-40 -left-40 w-125 h-125 rounded-full bg-[#1B2847]/5" />
       </div>
 
       <div className="w-full max-w-lg relative z-10">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(228,224,217,0.8)] overflow-hidden">
-          {/* Header stripe */}
-          <div className="h-1.5 bg-gradient-to-r from-[#C41230] via-[#C8A84B] to-[#1B2847]" />
+          <div className="h-1.5 bg-linear-to-r from-[#C41230] via-[#C8A84B] to-[#1B2847]" />
 
           <div className="p-8">
-            {/* Logo / company */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1B2847] mb-4 shadow-lg">
                 <MapPin className="w-7 h-7 text-white" />
@@ -116,6 +203,20 @@ export default function RegisterPage() {
                   placeholder="+1 234 567 8900"
                   className="w-full h-12 px-4 rounded-lg border border-[#E4E0D9] text-[#111] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#1B2847]/20 focus:border-[#1B2847] transition-all"
                 />
+              </div>
+
+              {/* Deal subscription opt-in */}
+              <div className="flex items-start gap-3 pt-1">
+                <input
+                  type="checkbox"
+                  id="dealSubscription"
+                  name="dealSubscription"
+                  value="true"
+                  className="mt-0.5 w-4 h-4 rounded border-[#E4E0D9] text-[#C41230] focus:ring-[#C41230]"
+                />
+                <label htmlFor="dealSubscription" className="text-sm text-[#7A746D] cursor-pointer">
+                  Send me exclusive deals and discounts on tours
+                </label>
               </div>
 
               <div className="pt-4">

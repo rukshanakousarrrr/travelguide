@@ -46,6 +46,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
         if (!valid) return null;
 
+        // Non-admin accounts must verify their email before they can sign in
+        if (user.role !== "ADMIN" && !user.emailVerified) return null;
+
         return user;
       },
     }),

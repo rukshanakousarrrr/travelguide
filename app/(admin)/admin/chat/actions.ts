@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { emitNewMessage } from "@/lib/socket";
+import { sendEmail, guideMessageHtml } from "@/lib/email";
+import { COMPANY_NAME } from "@/lib/constants";
 
 export async function getConversations() {
   const conversations = await prisma.chatConversation.findMany({
@@ -34,11 +36,13 @@ export async function sendAdminMessage(conversationId: string, content: string) 
   const session = await auth();
   if (!session?.user) return { error: "Not authenticated" };
 
+  const guideName = session.user.name ?? "Your Guide";
+
   const msg = await prisma.chatMessage.create({
     data: {
       conversationId,
       senderId:   session.user.id,
-      senderName: session.user.name ?? "Guide",
+      senderName: guideName,
       senderRole: "ADMIN",
       content:    content.trim(),
     },
@@ -51,6 +55,46 @@ export async function sendAdminMessage(conversationId: string, content: string) 
   });
 
   emitNewMessage(conversationId, msg);
+
+  // Email the customer so they know a reply is waiting
+  const convo = await prisma.chatConversation.findUnique({
+    where:   { id: conversationId },
+    include: {
+      customer: { select: { email: true, name: true } },
+      booking:  { select: { bookingRef: true, tour: { select: { title: true } } } },
+    },
+  });
+
+  if (convo?.customer?.email) {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+    try {
+      await sendEmail({
+        to:      convo.customer.email,
+        subject: `New message from ${guideName} — ${COMPANY_NAME}`,
+        html:    guideMessageHtml({
+          customerName:   convo.customer.name ?? "Traveller",
+          guideName,
+          messagePreview: content.trim().slice(0, 200),
+          tourTitle:      convo.booking?.tour.title   ?? "",
+          bookingRef:     convo.booking?.bookingRef   ?? "",
+          viewUrl:        `${baseUrl}/bookings`,
+        }),
+      });
+      await prisma.emailLog.create({
+        data: {
+          to:      convo.customer.email,
+          subject: `New message from ${guideName}`,
+          type:    "GUIDE_MESSAGE",
+          status:  "SENT",
+          sentAt:  new Date(),
+        },
+      });
+    } catch (err) {
+      // Don't fail the message send if email fails
+      console.error("Guide message email error:", err);
+    }
+  }
+
   revalidatePath("/admin/chat");
   return { message: msg };
 }

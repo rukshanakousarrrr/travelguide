@@ -30,8 +30,18 @@ export async function credentialsSignInAction(formData: FormData) {
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
-        case "CredentialsSignin":
+        case "CredentialsSignin": {
+          // Distinguish unverified account from wrong password
+          const { prisma } = await import("@/lib/prisma");
+          const u = await prisma.user.findUnique({
+            where:  { email },
+            select: { emailVerified: true, role: true },
+          });
+          if (u && !u.emailVerified && u.role !== "ADMIN") {
+            return { error: "Please verify your email before signing in. Check your inbox for the verification link." };
+          }
           return { error: "Invalid email or password." };
+        }
         default:
           return { error: "An error occurred during sign in." };
       }

@@ -72,6 +72,8 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  dealSubscription Boolean   @default(false) // opted-in to promotional deal emails
+
   accounts      Account[]
   sessions      Session[]
   bookings      Booking[]
@@ -481,6 +483,10 @@ enum EmailType {
   MANUAL_PAYMENT_INSTRUCTIONS
   ADMIN_NEW_BOOKING
   ADMIN_NEW_MESSAGE
+  EMAIL_VERIFICATION
+  WISHLIST_DISCOUNT
+  GUIDE_MESSAGE
+  DEAL_ALERT
 }
 
 enum EmailStatus {

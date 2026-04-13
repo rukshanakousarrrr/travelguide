@@ -2,14 +2,24 @@
 
 import { googleSignInAction, credentialsSignInAction } from "./actions";
 import { COMPANY_NAME } from "@/lib/constants";
-import { MapPin, ArrowRight } from "lucide-react";
-import { useState, useTransition } from "react";
+import { MapPin, ArrowRight, CheckCircle, AlertTriangle } from "lucide-react";
+import { useState, useTransition, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function ClientLoginPage() {
+function LoginForm() {
   const [loadingGoogle, setLoadingGoogle] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition]      = useTransition();
+  const [error, setError]                 = useState<string | null>(null);
+  const searchParams                      = useSearchParams();
+
+  const verified   = searchParams.get("verified") === "1";
+  const linkError  = searchParams.get("error");
+  const linkBanner = linkError === "link_expired"
+    ? "Verification link has expired. Please register again or request a new link."
+    : linkError === "invalid_link"
+    ? "Invalid verification link. Please check your email or register again."
+    : null;
 
   async function handleCredentialsSubmit(formData: FormData) {
     setError(null);
@@ -22,18 +32,18 @@ export default function ClientLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8F7F5] via-white to-[#F1EFE9] px-4 pt-24 pb-16">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#F8F7F5] via-white to-[#F1EFE9] px-4 pt-24 pb-16">
       {/* Decorative background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#C41230]/5" />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-[#1B2847]/5" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-[#E4E0D9]/60" />
+        <div className="absolute -top-40 -right-40 w-150 h-150 rounded-full bg-[#C41230]/5" />
+        <div className="absolute -bottom-40 -left-40 w-125 h-125 rounded-full bg-[#1B2847]/5" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 rounded-full border border-[#E4E0D9]/60" />
       </div>
 
       <div className="w-full max-w-md relative z-10">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(228,224,217,0.8)] overflow-hidden">
           {/* Header stripe */}
-          <div className="h-1.5 bg-gradient-to-r from-[#C41230] via-[#C8A84B] to-[#1B2847]" />
+          <div className="h-1.5 bg-linear-to-r from-[#C41230] via-[#C8A84B] to-[#1B2847]" />
 
           <div className="p-8">
             <div className="text-center mb-8">
@@ -47,6 +57,20 @@ export default function ClientLoginPage() {
                 Sign in to book tours and leave reviews
               </p>
             </div>
+
+            {verified && (
+              <div className="mb-6 p-4 bg-[#DCFCE7] text-[#166534] text-sm rounded-lg border border-[#86EFAC]/50 flex items-start gap-3">
+                <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>Email verified successfully! You can now sign in.</span>
+              </div>
+            )}
+
+            {linkBanner && (
+              <div className="mb-6 p-4 bg-[#FEF3C7] text-[#92400E] text-sm rounded-lg border border-[#FCD34D]/50 flex items-start gap-3">
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{linkBanner}</span>
+              </div>
+            )}
 
             {error && (
               <div className="mb-6 p-4 bg-[#FEE2E2] text-[#C41230] text-sm rounded-lg border border-[#FCA5A5]/50">
@@ -144,5 +168,13 @@ export default function ClientLoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ClientLoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
