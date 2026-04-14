@@ -3,6 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { X, MapPin, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { COMPANY_NAME } from "@/lib/constants";
 import { googleSignInAction, credentialsSignInAction } from "@/app/auth/login/actions";
 import { registerUserAction } from "@/app/auth/register/actions";
@@ -119,7 +120,7 @@ function AuthModalContent() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-sm font-semibold text-[#111]">Password</label>
-                  <span className="text-[11px] font-bold text-[#C41230] hover:underline cursor-pointer">Forgot?</span>
+                  <Link href="/auth/forgot-password" className="text-[11px] font-bold text-[#C41230] hover:underline">Forgot?</Link>
                 </div>
                 <input
                   type="password"

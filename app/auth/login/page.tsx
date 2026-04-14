@@ -96,8 +96,7 @@ function LoginForm() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-sm font-semibold text-[#111]">Password</label>
-                  {/* Forgot password stub */}
-                  <span className="text-xs text-[#C41230] hover:underline cursor-pointer">Forgot password?</span>
+                  <Link href="/auth/forgot-password" className="text-xs text-[#C41230] hover:underline">Forgot password?</Link>
                 </div>
                 <input
                   type="password"

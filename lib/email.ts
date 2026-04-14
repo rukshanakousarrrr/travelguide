@@ -353,7 +353,44 @@ export function wishlistDiscountHtml(data: {
   });
 }
 
-// ─── 5. Deal alert (newsletter subscribers) ───────────────────────────────────
+// ─── 5. Password reset ────────────────────────────────────────────────────────
+
+export function passwordResetHtml(data: {
+  name:     string;
+  resetUrl: string;
+}): string {
+  const body = `
+    <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#1B2847;font-family:Georgia,'Times New Roman',serif;">Reset your password</p>
+    <p style="margin:0 0 24px;font-size:15px;color:#4A4540;line-height:1.7;">
+      Hi ${data.name}, we received a request to reset the password for your ${COMPANY_NAME} account. Click the button below to choose a new password.
+    </p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F8F7F5;border-radius:10px;border:1px solid #E4E0D9;padding:0;">
+      <tr>
+        <td style="padding:24px 28px;text-align:center;">
+          <p style="margin:0 0 6px;font-size:13px;color:#7A746D;letter-spacing:0.5px;text-transform:uppercase;">This link expires in</p>
+          <p style="margin:0;font-size:28px;font-weight:700;color:#C41230;">1 hour</p>
+        </td>
+      </tr>
+    </table>
+
+    ${ctaButton("Reset My Password", data.resetUrl)}
+
+    <p style="margin:28px 0 0;font-size:13px;color:#7A746D;line-height:1.6;">
+      If the button above doesn't work, copy and paste this link into your browser:<br />
+      <a href="${data.resetUrl}" style="color:#C41230;word-break:break-all;">${data.resetUrl}</a>
+    </p>
+    <p style="margin:20px 0 0;font-size:13px;color:#A8A29E;">If you didn't request a password reset, you can safely ignore this email. Your password will not change.</p>
+  `;
+
+  return baseTemplate({
+    previewText: `Reset your ${COMPANY_NAME} account password`,
+    headerLabel: "Password Reset",
+    body,
+  });
+}
+
+// ─── 6. Deal alert (newsletter subscribers) ───────────────────────────────────
 
 export function dealAlertHtml(data: {
   customerName:  string;
