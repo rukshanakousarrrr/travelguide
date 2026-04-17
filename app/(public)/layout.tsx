@@ -17,7 +17,7 @@ export default async function PublicLayout({ children }: { children: React.React
         select: { id: true, name: true, subtitle: true, imageUrl: true, linkQuery: true },
       },
     },
-  });
+  }).catch(() => []);
 
   return (
     <>

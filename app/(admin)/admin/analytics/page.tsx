@@ -193,7 +193,7 @@ export default async function AnalyticsPage() {
     },
     {
       label:  "Total customers",
-      value:  (await prisma.user.count({ where: { role: "CUSTOMER" } })).toLocaleString(),
+      value:  (await prisma.user.count({ where: { role: "CUSTOMER" } }).catch(() => 0)).toLocaleString(),
       delta:  null,
       sub:    "Registered accounts",
       icon:   Users,

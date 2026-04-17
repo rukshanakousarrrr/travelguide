@@ -56,7 +56,7 @@ export default async function PublicToursPage({ searchParams }: PageProps) {
     include: {
       images: { where: { isPrimary: true }, take: 1 },
     } as any,
-  });
+  }).catch(() => []);
 
   let userWishlists: any[] = [];
   if (userId) {

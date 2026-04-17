@@ -23,7 +23,7 @@ export default async function HomePage() {
           select:  { id: true, name: true, subtitle: true, imageUrl: true, linkQuery: true },
         },
       },
-    }),
+    }).catch(() => []),
   ]);
 
   return (
