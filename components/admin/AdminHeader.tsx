@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Menu, Bell, Search, ChevronRight } from "lucide-react";
 import { getInitials } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 
 const breadcrumbLabels: Record<string, string> = {
   admin:     "Dashboard",
