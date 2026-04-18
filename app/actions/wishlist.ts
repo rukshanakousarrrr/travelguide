@@ -29,7 +29,6 @@ export async function toggleWishlistAction(tourId: string) {
         WHERE userId = ${userId} AND tourId = ${tourId}
       `;
       revalidatePath("/wishlist");
-      revalidatePath(`/tours`, "layout");
       return { success: true, added: false };
     } else {
       // Create using raw SQL
@@ -39,7 +38,6 @@ export async function toggleWishlistAction(tourId: string) {
         VALUES (${id}, ${userId}, ${tourId}, ${new Date()})
       `;
       revalidatePath("/wishlist");
-      revalidatePath(`/tours`, "layout");
       return { success: true, added: true };
     }
   } catch (error) {

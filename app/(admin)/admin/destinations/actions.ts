@@ -2,8 +2,13 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { slugify } from "@/lib/utils";
+
+function clearDestinationsCache() {
+  revalidateTag("destinations", "default");
+  revalidatePath("/admin/destinations");
+}
 
 async function assertAdmin() {
   const session = await auth();
@@ -21,7 +26,7 @@ export async function createDestination(name: string) {
   await prisma.destination.create({
     data: { name, slug, order: (max._max.order ?? 0) + 1 },
   });
-  revalidatePath("/admin/destinations");
+  clearDestinationsCache();
 }
 
 export async function updateDestination(id: string, name: string, isActive: boolean) {
@@ -30,13 +35,13 @@ export async function updateDestination(id: string, name: string, isActive: bool
     where: { id },
     data:  { name, slug: slugify(name), isActive },
   });
-  revalidatePath("/admin/destinations");
+  clearDestinationsCache();
 }
 
 export async function deleteDestination(id: string) {
   await assertAdmin();
   await prisma.destination.delete({ where: { id } });
-  revalidatePath("/admin/destinations");
+  clearDestinationsCache();
 }
 
 export async function reorderDestination(id: string, direction: "up" | "down") {
@@ -50,7 +55,7 @@ export async function reorderDestination(id: string, direction: "up" | "down") {
     prisma.destination.update({ where: { id: all[idx].id }, data: { order: all[swap].order } }),
     prisma.destination.update({ where: { id: all[swap].id }, data: { order: all[idx].order } }),
   ]);
-  revalidatePath("/admin/destinations");
+  clearDestinationsCache();
 }
 
 // ── Places ────────────────────────────────────────────────────────────────────
@@ -74,7 +79,7 @@ export async function createPlace(
       order:     (max._max.order ?? 0) + 1,
     },
   });
-  revalidatePath("/admin/destinations");
+  clearDestinationsCache();
 }
 
 export async function updatePlace(
@@ -92,11 +97,11 @@ export async function updatePlace(
       isActive:  data.isActive,
     },
   });
-  revalidatePath("/admin/destinations");
+  clearDestinationsCache();
 }
 
 export async function deletePlace(id: string) {
   await assertAdmin();
   await prisma.place.delete({ where: { id } });
-  revalidatePath("/admin/destinations");
+  clearDestinationsCache();
 }

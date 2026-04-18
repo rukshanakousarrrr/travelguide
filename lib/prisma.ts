@@ -4,19 +4,21 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
+// Keep connection pool small on shared Hostinger hosting to avoid exhausting
+// the MySQL max_connections limit (typically 100 on shared plans).
+const DATABASE_URL = process.env.DATABASE_URL
+  ? process.env.DATABASE_URL.includes("connection_limit")
+    ? process.env.DATABASE_URL
+    : process.env.DATABASE_URL + "?connection_limit=3&pool_timeout=10"
+  : undefined;
+
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-    // Hostinger shared hosting may close idle connections; configure pool
-    datasourceUrl: process.env.DATABASE_URL,
+    datasourceUrl: DATABASE_URL,
   });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
-
-// Log connection issues on startup (doesn't block)
-prisma.$connect().catch((e) => {
-  console.error("⚠ Prisma failed to connect to database:", e.message);
-});

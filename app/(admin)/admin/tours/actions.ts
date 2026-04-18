@@ -2,7 +2,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+
+function clearToursCache() { revalidateTag("tours", "default"); }
 import { slugify } from "@/lib/utils";
 
 /** Safely parse a JSON string — never throws, always returns a valid array */
@@ -146,11 +148,13 @@ export async function saveTourAction(formData: FormData): Promise<ActionResult> 
   try {
     if (isEdit) {
       await prisma.tour.update({ where: { id: tourId }, data });
+      clearToursCache();
       revalidatePath("/admin/tours");
       revalidatePath(`/admin/tours/${tourId}`);
       return { success: "Tour updated successfully.", tourId: tourId };
     } else {
       const tour = await prisma.tour.create({ data });
+      clearToursCache();
       revalidatePath("/admin/tours");
       return { success: "Tour created successfully.", tourId: tour.id };
     }
@@ -166,6 +170,7 @@ export async function deleteTourAction(tourId: string): Promise<ActionResult> {
   await assertAdmin();
   try {
     await prisma.tour.delete({ where: { id: tourId } });
+    clearToursCache();
     revalidatePath("/admin/tours");
     return { success: "Tour deleted." };
   } catch {
@@ -185,6 +190,7 @@ export async function toggleTourStatusAction(
       where: { id: tourId },
       data:  { status: newStatus },
     });
+    clearToursCache();
     revalidatePath("/admin/tours");
     return { success: `Tour status changed to ${newStatus.toLowerCase()}.` };
   } catch {

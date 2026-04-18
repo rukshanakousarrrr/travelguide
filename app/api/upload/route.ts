@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import sharp from "sharp";
+import { v2 as cloudinary } from "cloudinary";
 import { auth } from "@/lib/auth";
 
 export const runtime = "nodejs";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -19,29 +23,28 @@ export async function POST(req: NextRequest) {
 
   const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
   if (!allowed.includes(file.type)) {
-    return NextResponse.json({ error: "Only JPEG, PNG, WebP, or GIF files are allowed." }, { status: 400 });
+    return NextResponse.json({ error: "Only JPEG, PNG, WebP, or GIF allowed." }, { status: 400 });
   }
 
   if (file.size > 10 * 1024 * 1024) {
     return NextResponse.json({ error: "File must be under 10 MB." }, { status: 400 });
   }
 
-  const bytes = await file.arrayBuffer();
+  const bytes  = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const optimized = await sharp(buffer)
-    .resize(1400, 1000, { fit: "inside", withoutEnlargement: true })
-    .webp({ quality: 85 })
-    .toBuffer();
+  const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      {
+        folder:         "gotripjapan",
+        transformation: [{ width: 1400, height: 1000, crop: "limit", quality: "auto:good", fetch_format: "auto" }],
+      },
+      (err, res) => {
+        if (err || !res) reject(err ?? new Error("Upload failed"));
+        else resolve(res as { secure_url: string });
+      }
+    ).end(buffer);
+  });
 
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.webp`;
-  // MEDIA_DIR must be set to an absolute path OUTSIDE the git deployment folder
-  // e.g. on Hostinger: /home/u123456789/media
-  // Falls back to <project>/media for local development
-  const mediaDir = process.env.MEDIA_DIR ?? join(process.cwd(), "media");
-
-  await mkdir(mediaDir, { recursive: true });
-  await writeFile(join(mediaDir, filename), optimized);
-
-  return NextResponse.json({ url: `/media/${filename}` });
+  return NextResponse.json({ url: result.secure_url });
 }

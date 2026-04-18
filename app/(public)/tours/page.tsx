@@ -1,7 +1,19 @@
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 import { TourCard } from "@/components/public/TourCard";
 import { ToursFilterBar } from "@/components/public/ToursFilterBar";
 import { auth } from "@/lib/auth";
+
+// Cache all published tours for 5 minutes — filtered by searchParams in-memory
+const getCachedPublishedTours = unstable_cache(
+  async () => prisma.tour.findMany({
+    where:   { status: "PUBLISHED" },
+    orderBy: { createdAt: "desc" },
+    include: { images: { where: { isPrimary: true }, take: 1 } } as any,
+  }),
+  ["published-tours"],
+  { revalidate: 300, tags: ["tours"] }
+);
 
 export const metadata = {
   title: "Tours & Experiences",
@@ -37,31 +49,24 @@ export default async function PublicToursPage({ searchParams }: PageProps) {
   const duration   = sp.duration           ?? "";
 
   // Build where clause
-  const conditions: any[] = [{ status: "PUBLISHED" }];
-  if (q) {
-    conditions.push({
-      OR: [
-        { title:            { contains: q } },
-        { location:         { contains: q } },
-        { shortDescription: { contains: q } },
-      ],
-    });
-  }
-  if (category   && category   !== "ALL") conditions.push({ category });
-  if (difficulty && difficulty !== "ALL") conditions.push({ difficulty });
-  if (minPrice !== undefined)             conditions.push({ basePrice: { gte: minPrice } });
-  if (maxPrice !== undefined)             conditions.push({ basePrice: { lte: maxPrice } });
-  if (duration   && duration   !== "ALL") conditions.push({ durationType: duration });
-
-  const where = conditions.length === 1 ? conditions[0] : { AND: conditions };
-
-  const tours = await prisma.tour.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: {
-      images: { where: { isPrimary: true }, take: 1 },
-    } as any,
-  }).catch(() => []);
+  // Fetch from cache, then filter in-memory — avoids a DB hit per unique filter combination
+  const allTours = await getCachedPublishedTours().catch(() => [] as any[]);
+  const tours = allTours.filter((t: any) => {
+    if (q) {
+      const ql = q.toLowerCase();
+      if (
+        !t.title?.toLowerCase().includes(ql) &&
+        !t.location?.toLowerCase().includes(ql) &&
+        !t.shortDescription?.toLowerCase().includes(ql)
+      ) return false;
+    }
+    if (category   && category   !== "ALL" && t.category   !== category)   return false;
+    if (difficulty && difficulty !== "ALL" && t.difficulty !== difficulty) return false;
+    if (minPrice   !== undefined && Number(t.basePrice) < minPrice)        return false;
+    if (maxPrice   !== undefined && Number(t.basePrice) > maxPrice)        return false;
+    if (duration   && duration   !== "ALL" && t.durationType !== duration) return false;
+    return true;
+  });
 
   let userWishlists: any[] = [];
   if (userId) {
