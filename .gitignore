@@ -20,6 +20,9 @@
 # production
 /build
 
+# uploaded media (stored on server disk, not in git)
+/media
+
 # misc
 .DS_Store
 *.pem
