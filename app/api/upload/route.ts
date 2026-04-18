@@ -35,7 +35,10 @@ export async function POST(req: NextRequest) {
     .toBuffer();
 
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.webp`;
-  const mediaDir = join(process.cwd(), "media");
+  // MEDIA_DIR must be set to an absolute path OUTSIDE the git deployment folder
+  // e.g. on Hostinger: /home/u123456789/media
+  // Falls back to <project>/media for local development
+  const mediaDir = process.env.MEDIA_DIR ?? join(process.cwd(), "media");
 
   await mkdir(mediaDir, { recursive: true });
   await writeFile(join(mediaDir, filename), optimized);

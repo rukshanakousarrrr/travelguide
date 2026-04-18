@@ -23,7 +23,8 @@ app.prepare().then(() => {
     // ── Serve uploaded media files ────────────────────────────
     if (req.url?.startsWith("/media/")) {
       const filename = req.url.slice(7).split("?")[0]; // strip query string
-      const filepath = join(process.cwd(), "media", filename);
+      const mediaDir = process.env.MEDIA_DIR ?? join(process.cwd(), "media");
+      const filepath = join(mediaDir, filename);
       try {
         const data = await readFile(filepath);
         const ext  = extname(filename).toLowerCase();
