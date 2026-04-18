@@ -6,13 +6,13 @@
 ────────────────────────────────────────────── */
 
 :root {
-  /* Brand */
-  --color-primary:       #C41230; /* Beni — Japan crimson            */
-  --color-primary-dark:  #A00E25; /* deeper hover state              */
-  --color-primary-light: #F5E6E9; /* tint for badges / backgrounds   */
-  --color-secondary:     #1B2847; /* Kachi — deep navy ink           */
-  --color-accent:        #C8A84B; /* Kin — Japanese gold             */
-  --color-accent-light:  #F7F0DC; /* gold tint                       */
+  /* Brand — GoTripJapan palette */
+  --color-primary:       #185FA5; /* GoTripJapan blue                */
+  --color-primary-dark:  #0C447C; /* deep blue / hover state         */
+  --color-primary-light: #E6F1FB; /* blue tint for badges/bg         */
+  --color-secondary:     #0C447C; /* dark blue — footer, dark areas  */
+  --color-accent:        #EF9F27; /* brand gold / amber              */
+  --color-accent-light:  #FDF3E2; /* gold tint                       */
 
   /* Neutral surface scale */
   --color-background:    #FFFFFF;

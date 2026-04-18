@@ -19,30 +19,44 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "https://gotripjapan.com"),
   title: {
-    default: "GoTripJapan",
+    default: "GoTripJapan — Your Japan Journey Starts Here",
     template: "%s | GoTripJapan",
   },
   description:
-    "GoTripJapan offers handcrafted, expert-guided tours across Japan. Explore Tokyo, Kyoto, Osaka and beyond with local guides. Book your perfect Japan experience today.",
+    "GoTripJapan offers expertly crafted Japan tour packages for 2026. Explore Tokyo, Kyoto, Osaka, Hiroshima and beyond with local guides. Custom itineraries, group & private tours. Book your perfect Japan trip today.",
   keywords: [
-    "GoTripJapan", "Japan tours", "Japan travel", "guided tours Japan",
-    "Tokyo tours", "Kyoto tours", "Osaka tours", "Japan holiday", "Japan trip",
-    "private Japan tours", "cultural Japan tours", "Japan adventure tours",
+    "GoTripJapan",
+    "Japan tour packages 2026",
+    "Japan travel itinerary",
+    "best Japan travel agency",
+    "custom Japan trip planner",
+    "guided tours Japan",
+    "Tokyo tours",
+    "Kyoto tours",
+    "Osaka tours",
+    "Japan holiday packages",
+    "private Japan tours",
+    "cultural Japan tours",
+    "Japan adventure tours",
+    "Japan trip cost",
+    "first time visiting Japan",
+    "cherry blossom Japan tour",
+    "Japan golden week travel",
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "GoTripJapan",
-    title: "GoTripJapan",
+    title: "GoTripJapan — Your Japan Journey Starts Here",
     description:
-      "GoTripJapan offers handcrafted, expert-guided tours across Japan. Explore Tokyo, Kyoto, Osaka and beyond with local guides.",
+      "Expertly crafted Japan tour packages for 2026. Custom itineraries, group & private tours to Tokyo, Kyoto, Osaka and beyond. Book with GoTripJapan today.",
   },
   twitter: {
     card: "summary_large_image",
     site: "@gotripjapan",
-    title: "GoTripJapan",
+    title: "GoTripJapan — Your Japan Journey Starts Here",
     description:
-      "Handcrafted Japan tours led by expert local guides. Book your perfect Japan experience with GoTripJapan.",
+      "Japan tour packages 2026 — custom itineraries, local guides, group & private tours. Your Japan journey starts at GoTripJapan.",
   },
   alternates: {
     canonical: "/",
@@ -50,12 +64,12 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true },
+    googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large", "max-video-preview": -1 },
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#C41230",
+  themeColor: "#185FA5",
   width: "device-width",
   initialScale: 1,
 };

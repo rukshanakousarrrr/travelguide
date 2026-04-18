@@ -33,9 +33,9 @@ export function Footer() {
                 <Image
                   src="/asstes/footer.PNG"
                   alt="GoTripJapan"
-                  width={120}
-                  height={120}
-                  className="h-20 w-auto object-contain"
+                  width={160}
+                  height={160}
+                  className="h-28 w-auto object-contain"
                 />
               </div>
             </Link>

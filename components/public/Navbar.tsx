@@ -69,9 +69,9 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
               <Image
                 src="/asstes/logoo.PNG"
                 alt="GoTripJapan"
-                width={160}
-                height={40}
-                className="h-10 w-auto object-contain"
+                width={200}
+                height={50}
+                className="h-14 w-auto object-contain"
                 priority
               />
             </div>
