@@ -113,34 +113,46 @@ export function TourForm({ initialData }: TourFormProps) {
 
   // ── Upload helper ─────────────────────────
   async function uploadFile(file: File): Promise<string | null> {
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    const json = await res.json();
-    if (!res.ok) { alert(json.error ?? "Upload failed."); return null; }
-    return json.url as string;
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res  = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) { alert(json.error ?? "Upload failed."); return null; }
+      return json.url as string;
+    } catch (err) {
+      alert("Upload failed: network error. Please try again.");
+      console.error("Upload error:", err);
+      return null;
+    }
   }
 
   async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingCover(true);
-    const url = await uploadFile(file);
-    if (url) update("coverImage", url);
-    setUploadingCover(false);
+    try {
+      const url = await uploadFile(file);
+      if (url) update("coverImage", url);
+    } finally {
+      setUploadingCover(false);
+    }
   }
 
   async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingSlot(index);
-    const url = await uploadFile(file);
-    if (url) {
-      const next = [...data.galleryImages];
-      next[index] = url;
-      update("galleryImages", next);
+    try {
+      const url = await uploadFile(file);
+      if (url) {
+        const next = [...data.galleryImages];
+        next[index] = url;
+        update("galleryImages", next);
+      }
+    } finally {
+      setUploadingSlot(null);
     }
-    setUploadingSlot(null);
   }
 
   // ── Helpers ──────────────────────────────
