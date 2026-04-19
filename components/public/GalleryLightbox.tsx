@@ -87,7 +87,7 @@ export function GalleryLightbox({ images, initialIndex = 0, onClose }: GalleryLi
                   i === current ? "border-white scale-110" : "border-transparent opacity-60 hover:opacity-100"
                 }`}
               >
-                <img src={img.url} alt="" className="w-full h-full object-cover" />
+                <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover" />
               </button>
             ))}
           </div>

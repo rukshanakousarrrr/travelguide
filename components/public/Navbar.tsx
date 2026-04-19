@@ -251,7 +251,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                         <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-[#E7E8EE]">
                           {place.imageUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" />
+                            <img src={place.imageUrl} alt={place.name} loading="lazy" className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <MapPin className="size-4 text-[#A8A29E]" />

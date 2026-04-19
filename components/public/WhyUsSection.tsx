@@ -202,6 +202,7 @@ export function WhyUsSection({ reviews, avgRating, totalReviews }: Props) {
                       <img
                         src={r.photoUrl}
                         alt={r.name}
+                        loading="lazy"
                         className="w-11 h-11 rounded-full object-cover shrink-0 shadow-sm"
                       />
                     ) : (

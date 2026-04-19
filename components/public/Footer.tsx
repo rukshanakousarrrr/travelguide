@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Mail, Phone, Share2, Tv, Play, ArrowRight } from "lucide-react";
+import { MapPin, Mail, Phone, Share2, ExternalLink, Play, ArrowRight } from "lucide-react";
 import { COMPANY_NAME, COMPANY_EMAIL, COMPANY_PHONE } from "@/lib/constants";
 
 const TOUR_LINKS = [
@@ -70,7 +70,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               {[
                 { Icon: Share2, label: "Instagram", href: "#" },
-                { Icon: Tv,     label: "Facebook", href: "https://www.facebook.com/GoTripJapan" },
+                { Icon: ExternalLink, label: "Facebook", href: "https://www.facebook.com/GoTripJapan" },
                 { Icon: Play,   label: "YouTube", href: "#"   },
               ].map(({ Icon, label, href }) => (
                 <a

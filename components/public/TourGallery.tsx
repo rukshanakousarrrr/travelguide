@@ -30,7 +30,7 @@ export function TourGallery({ coverImage, allImages, title, likelyToSellOut }: T
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[300px] sm:h-[400px] md:h-[500px] relative group/gallery">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-75 sm:h-100 md:h-125 relative group/gallery">
         {/* Main Cover */}
         <div
           className={`md:col-span-3 rounded-2xl overflow-hidden relative cursor-pointer group ${!coverImage ? "bg-[#0C447C]" : ""}`}
@@ -39,7 +39,7 @@ export function TourGallery({ coverImage, allImages, title, likelyToSellOut }: T
           {coverImage ? (
             <img src={coverImage} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#0C447C] to-[#185FA5] opacity-80" />
+            <div className="absolute inset-0 bg-linear-to-tr from-[#0C447C] to-[#185FA5] opacity-80" />
           )}
           {likelyToSellOut && (
             <div className="absolute top-6 left-6 bg-[#185FA5] text-white text-sm font-bold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2">
@@ -59,7 +59,7 @@ export function TourGallery({ coverImage, allImages, title, likelyToSellOut }: T
                 onClick={() => img && openLightbox(allImages.findIndex((i) => i.url === img.url))}
               >
                 {img ? (
-                  <img src={img.url} alt="Gallery" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={img.url} alt="Gallery" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[#A8A29E]">
                     <Map className="size-8 opacity-20" />
@@ -115,10 +115,10 @@ export function GalleryCarousel({ images }: { images: TourImage[] }) {
               {images.map((img, i) => (
                 <div
                   key={i}
-                  className="shrink-0 w-full aspect-[16/9] relative cursor-pointer"
+                  className="shrink-0 w-full aspect-video relative cursor-pointer"
                   onClick={() => { setLightboxOpen(true); }}
                 >
-                  <img src={img.url} alt={img.altText || `Gallery photo ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={img.url} alt={img.altText || `Gallery photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>

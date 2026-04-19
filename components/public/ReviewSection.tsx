@@ -161,7 +161,7 @@ export function ReviewSection({ tourId, reviews, currentUserId, averageRating, r
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-[#0C447C] text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
                   {review.user.image ? (
-                    <img src={review.user.image} alt="" className="w-full h-full object-cover" />
+                    <img src={review.user.image} alt="" loading="lazy" className="w-full h-full object-cover" />
                   ) : (
                     (review.user.name || "U")[0].toUpperCase()
                   )}

@@ -1,14 +1,18 @@
+import dynamic from "next/dynamic";
 import { Navbar } from "@/components/public/Navbar";
 import { Footer } from "@/components/public/Footer";
-import { AuthModal } from "@/components/public/AuthModal";
 import { HeroSection } from "@/components/public/HeroSection";
 import { DestinationsSection } from "@/components/public/DestinationsSection";
 import { ExperienceSection } from "@/components/public/ExperienceSection";
 import { WhyUsSection, type ReviewItem } from "@/components/public/WhyUsSection";
-import { TourRowSection, type RowTour } from "@/components/public/TourRowSection";
+import { type RowTour } from "@/components/public/TourRowSection";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
+
+// Client components below the fold — dynamically imported to split their JS bundle
+const TourRowSection = dynamic(() => import("@/components/public/TourRowSection").then(m => ({ default: m.TourRowSection })));
+const AuthModal      = dynamic(() => import("@/components/public/AuthModal").then(m => ({ default: m.AuthModal })));
 
 const TOP_ACTIVITY_CATS = [
   "Guided tours", "Food tours", "Day trips", "Cultural experiences",
