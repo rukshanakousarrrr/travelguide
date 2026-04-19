@@ -4,7 +4,7 @@ const TRUST_ITEMS = [
   {
     icon: ShieldCheck,
     title: "Secure Payments",
-    description: "Protected by Stripe — the world's leading payment platform.",
+    description: "Payments are processed securely by Stripe, the world's leading payment platform.",
     accent: "#185FA5",
     bgLight: "#E6F1FB",
   },
@@ -18,7 +18,7 @@ const TRUST_ITEMS = [
   {
     icon: Headphones,
     title: "24/7 Support",
-    description: "Live chat or email — before, during, and after your trip.",
+    description: "Live chat and email support before, during, and after your trip.",
     accent: "#0C447C",
     bgLight: "#DBEAFE",
   },
@@ -32,7 +32,7 @@ const TRUST_ITEMS = [
   {
     icon: MapPin,
     title: "Local Experts",
-    description: "Every guide is born and raised in Japan — real insider knowledge.",
+    description: "Every guide is born and raised in Japan, with real insider knowledge.",
     accent: "#DC2626",
     bgLight: "#FEE2E2",
   },
@@ -45,37 +45,65 @@ const TRUST_ITEMS = [
   },
 ];
 
-const REVIEWS = [
+const AVATAR_GRADIENTS = [
+  "linear-gradient(135deg, #185FA5 0%, #0C447C 100%)",
+  "linear-gradient(135deg, #EF9F27 0%, #B45309 100%)",
+  "linear-gradient(135deg, #15803D 0%, #166534 100%)",
+  "linear-gradient(135deg, #7B1FA2 0%, #4A0072 100%)",
+  "linear-gradient(135deg, #DC2626 0%, #991B1B 100%)",
+];
+
+const FALLBACK_REVIEWS = [
   {
+    id: "f1",
     name: "Sarah M.",
-    country: "🇺🇸 USA",
+    country: "USA",
     tour: "Tokyo Hidden Gems",
     rating: 5,
-    text: "Absolutely incredible. Our guide knew every hidden alley in Shinjuku — found spots I'd never have discovered alone. Already planning my next trip!",
-    initial: "S",
-    gradient: "linear-gradient(135deg, #185FA5 0%, #0C447C 100%)",
+    text: "Absolutely incredible. Our guide knew every hidden alley in Shinjuku and found spots I'd never have discovered alone. Already planning my next trip!",
+    photoUrl: null,
   },
   {
+    id: "f2",
     name: "Tom K.",
-    country: "🇬🇧 UK",
+    country: "United Kingdom",
     tour: "Kyoto Temples & Tea",
     rating: 5,
     text: "The tea ceremony was the highlight of our Japan trip. The guide's passion for local history made every temple come alive. Worth every penny.",
-    initial: "T",
-    gradient: "linear-gradient(135deg, #EF9F27 0%, #B45309 100%)",
+    photoUrl: null,
   },
   {
+    id: "f3",
     name: "Yuki R.",
-    country: "🇦🇺 Australia",
+    country: "Australia",
     tour: "Mt. Fuji Sunrise",
     rating: 5,
-    text: "Watching the sunrise over Fuji was a bucket-list moment. The small group size made it so personal. No rushing, no crowds — just pure Japan.",
-    initial: "Y",
-    gradient: "linear-gradient(135deg, #15803D 0%, #166534 100%)",
+    text: "Watching the sunrise over Fuji was a bucket-list moment. The small group size made it so personal. No rushing, no crowds. Just pure Japan.",
+    photoUrl: null,
   },
 ];
 
-export function WhyUsSection() {
+export interface ReviewItem {
+  id: string;
+  name: string;
+  country: string | null;
+  tour: string;
+  rating: number;
+  text: string;
+  photoUrl: string | null;
+}
+
+interface Props {
+  reviews?: ReviewItem[];
+  avgRating?: number;
+  totalReviews?: number;
+}
+
+export function WhyUsSection({ reviews, avgRating, totalReviews }: Props) {
+  const displayReviews = (reviews && reviews.length > 0) ? reviews : FALLBACK_REVIEWS;
+  const displayRating  = avgRating  != null ? avgRating.toFixed(1)  : "4.9";
+  const displayCount   = totalReviews != null ? totalReviews          : 0;
+
   return (
     <>
       {/* ── Trust Badges ── */}
@@ -131,52 +159,69 @@ export function WhyUsSection() {
 
             {/* Aggregate score */}
             <div className="hidden sm:flex flex-col items-center bg-[#F8F9FF] rounded-2xl px-8 py-5">
-              <span className="font-display font-bold text-5xl text-[#185FA5] leading-none">4.9</span>
+              <span className="font-display font-bold text-5xl text-[#185FA5] leading-none">{displayRating}</span>
               <div className="flex gap-0.5 my-2">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} className="size-4 text-[#EF9F27] fill-[#EF9F27]" />
                 ))}
               </div>
-              <span className="text-xs text-[#7A746D] font-medium">1,800+ reviews</span>
+              <span className="text-xs text-[#7A746D] font-medium">
+                {displayCount > 0 ? `${displayCount.toLocaleString()} review${displayCount === 1 ? "" : "s"}` : "Top rated"}
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {REVIEWS.map((r) => (
-              <div
-                key={r.name}
-                className="relative bg-[#F8F9FF] rounded-2xl p-7 hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-300 group"
-              >
-                {/* Quote mark */}
-                <div className="absolute top-5 right-6 text-[#185FA5]/8 text-6xl font-display leading-none select-none">
-                  &ldquo;
-                </div>
+            {displayReviews.map((r, i) => {
+              const initial  = (r.name ?? "A")[0].toUpperCase();
+              const gradient = AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length];
 
-                {/* Stars */}
-                <div className="flex gap-0.5 mb-5">
-                  {Array.from({ length: r.rating }).map((_, i) => (
-                    <Star key={i} className="size-4 text-[#EF9F27] fill-[#EF9F27]" />
-                  ))}
-                </div>
-
-                <p className="text-[#111] text-sm leading-relaxed mb-6 relative z-10">
-                  &ldquo;{r.text}&rdquo;
-                </p>
-
-                <div className="flex items-center gap-3 pt-5 border-t border-[#E4E0D9]/50">
-                  <div
-                    className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm"
-                    style={{ background: r.gradient }}
-                  >
-                    {r.initial}
+              return (
+                <div
+                  key={r.id}
+                  className="relative bg-[#F8F9FF] rounded-2xl p-7 hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-300"
+                >
+                  {/* Decorative quote */}
+                  <div className="absolute top-5 right-6 text-[#185FA5]/8 text-6xl font-display leading-none select-none">
+                    &ldquo;
                   </div>
-                  <div>
-                    <div className="font-semibold text-sm text-[#111]">{r.name}</div>
-                    <div className="text-xs text-[#7A746D]">{r.country} · {r.tour}</div>
+
+                  {/* Stars */}
+                  <div className="flex gap-0.5 mb-5">
+                    {Array.from({ length: r.rating }).map((_, si) => (
+                      <Star key={si} className="size-4 text-[#EF9F27] fill-[#EF9F27]" />
+                    ))}
+                  </div>
+
+                  <p className="text-[#111] text-sm leading-relaxed mb-6 relative z-10">
+                    &ldquo;{r.text}&rdquo;
+                  </p>
+
+                  <div className="flex items-center gap-3 pt-5 border-t border-[#E4E0D9]/50">
+                    {r.photoUrl ? (
+                      <img
+                        src={r.photoUrl}
+                        alt={r.name}
+                        className="w-11 h-11 rounded-full object-cover shrink-0 shadow-sm"
+                      />
+                    ) : (
+                      <div
+                        className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm"
+                        style={{ background: gradient }}
+                      >
+                        {initial}
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-semibold text-sm text-[#111]">{r.name ?? "Anonymous"}</div>
+                      <div className="text-xs text-[#7A746D]">
+                        {r.country && `${r.country} · `}{r.tour}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

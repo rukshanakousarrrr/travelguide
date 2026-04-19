@@ -4,7 +4,6 @@ import { TourCard } from "@/components/public/TourCard";
 import { ToursFilterBar } from "@/components/public/ToursFilterBar";
 import { auth } from "@/lib/auth";
 
-// Cache all published tours for 5 minutes — filtered by searchParams in-memory
 const getCachedPublishedTours = unstable_cache(
   async () => prisma.tour.findMany({
     where:   { status: "PUBLISHED" },
@@ -33,13 +32,9 @@ interface PageProps {
 
 export default async function PublicToursPage({ searchParams }: PageProps) {
   let session = null;
-  try {
-    session = await auth();
-  } catch (e) {
-    console.error("Auth error in PublicToursPage:", e);
-  }
-  const userId  = session?.user?.id;
-  const sp      = await searchParams;
+  try { session = await auth(); } catch {}
+  const userId = session?.user?.id;
+  const sp     = await searchParams;
 
   const q          = sp.q?.trim()          ?? "";
   const category   = sp.category           ?? "";
@@ -48,8 +43,6 @@ export default async function PublicToursPage({ searchParams }: PageProps) {
   const maxPrice   = sp.maxPrice ? parseFloat(sp.maxPrice) : undefined;
   const duration   = sp.duration           ?? "";
 
-  // Build where clause
-  // Fetch from cache, then filter in-memory — avoids a DB hit per unique filter combination
   const allTours = await getCachedPublishedTours().catch(() => [] as any[]);
   const tours = allTours.filter((t: any) => {
     if (q) {
@@ -61,10 +54,10 @@ export default async function PublicToursPage({ searchParams }: PageProps) {
       ) return false;
     }
     if (category   && category   !== "ALL" && t.category   !== category)   return false;
-    if (difficulty && difficulty !== "ALL" && t.difficulty !== difficulty) return false;
-    if (minPrice   !== undefined && Number(t.basePrice) < minPrice)        return false;
-    if (maxPrice   !== undefined && Number(t.basePrice) > maxPrice)        return false;
-    if (duration   && duration   !== "ALL" && t.durationType !== duration) return false;
+    if (difficulty && difficulty !== "ALL" && t.difficulty !== difficulty)  return false;
+    if (minPrice   !== undefined && Number(t.basePrice) < minPrice)         return false;
+    if (maxPrice   !== undefined && Number(t.basePrice) > maxPrice)         return false;
+    if (duration   && duration   !== "ALL" && t.durationType !== duration)  return false;
     return true;
   });
 
@@ -72,36 +65,44 @@ export default async function PublicToursPage({ searchParams }: PageProps) {
   if (userId) {
     try {
       userWishlists = await prisma.$queryRaw`SELECT * FROM Wishlist WHERE userId = ${userId}`;
-    } catch (e) {
-      console.error("Wishlist query failed:", e);
-    }
+    } catch {}
   }
   const wishlistedTourIds = new Set(userWishlists.map((w: any) => w.tourId));
 
+  const activeCategory = category && category !== "ALL" ? category : null;
+
   return (
-    <div className="bg-[#F8F7F5] min-h-screen">
-      {/* Header */}
-      <div className="bg-[#1B2847] text-white pt-24 pb-16 px-6 lg:px-10">
-        <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
-          <h1 className="text-4xl md:text-5xl font-display font-semibold mb-4 leading-tight">Explore Our Tours</h1>
-          <p className="text-[#A8A29E] max-w-2xl text-lg font-light">
-            Find the perfect experience for your trip to Japan. From ancient temples to modern cityscapes.
+    <div className="bg-white min-h-screen pt-14">
+      {/* Sticky category pills + filter bar */}
+      <ToursFilterBar count={tours.length} />
+
+      {/* Page content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
+
+        {/* Title + count */}
+        <div className="mb-6">
+          <h1 className="text-[22px] font-bold text-[#111]">
+            {activeCategory
+              ? `${activeCategory.replace(/_/g, " ")} tours in Japan`
+              : q
+              ? `Results for "${q}"`
+              : "All Japan tours"}
+          </h1>
+          <p className="text-[13px] text-[#7A746D] mt-1">
+            {tours.length} {tours.length === 1 ? "experience" : "experiences"} available
           </p>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
-        <ToursFilterBar count={tours.length} />
-
+        {/* Grid */}
         {tours.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-[#E4E0D9]">
-            <p className="text-[#A8A29E] text-lg">No tours match your filters.</p>
+          <div className="text-center py-24 border border-[#E4E0D9] rounded-2xl bg-[#F8F7F5]">
+            <p className="text-[#7A746D] text-lg font-medium mb-2">No tours match your filters</p>
+            <p className="text-[#A8A29E] text-sm">Try adjusting or clearing your filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {tours.map((tour) => {
-              const t            = tour as any;
-              const primaryImage = t.images?.[0]?.url;
+              const t = tour as any;
               return (
                 <TourCard
                   key={tour.id}
@@ -118,9 +119,9 @@ export default async function PublicToursPage({ searchParams }: PageProps) {
                   category={tour.category}
                   featured={tour.featured}
                   likelyToSellOut={tour.likelyToSellOut}
-                  coverImage={primaryImage}
+                  coverImage={t.images?.[0]?.url}
                   isWishlisted={wishlistedTourIds.has(tour.id)}
-                  gradient="linear-gradient(135deg, #1B2847 0%, #C41230 100%)"
+                  gradient="linear-gradient(135deg, #0C447C 0%, #185FA5 100%)"
                 />
               );
             })}

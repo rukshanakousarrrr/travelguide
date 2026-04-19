@@ -27,9 +27,9 @@ export function BookingWidget({
 }: BookingWidgetProps) {
   const router = useRouter();
 
-  const [date,    setDate]    = useState("");
+  const [date, setDate]    = useState("");
   const [dateRec, setDateRec] = useState<AvailRecord | null>(null);
-  const [adults,  setAdults]  = useState(tourType === "SOLO" ? 1 : 2);
+  const [adults, setAdults]  = useState(tourType === "SOLO" ? 1 : 2);
   const [children, setChildren] = useState(0);
 
   const isSolo      = tourType === "SOLO";
@@ -101,7 +101,7 @@ export function BookingWidget({
       <div className="space-y-4 mb-6">
         {isSolo ? (
           <p className="text-sm text-[#7A746D] bg-[#F8F7F5] rounded-lg px-3 py-2">
-            This is a solo / private tour — priced per person.
+            This is a solo / private tour, priced per person.
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-4">
@@ -174,7 +174,7 @@ export function BookingWidget({
           <span className="font-semibold text-[#111]">Total Price</span>
           <span className="text-2xl font-bold text-[#111]">${totalPrice.toFixed(2)}</span>
         </div>
-        <span className="text-xs text-[#7A746D] block">No hidden fees — taxes included</span>
+        <span className="text-xs text-[#7A746D] block">No hidden fees. Taxes included.</span>
       </div>
 
       <button

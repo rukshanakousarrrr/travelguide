@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { Star, ChevronRight } from "lucide-react";
+import { Star } from "lucide-react";
 
 interface MiniTour {
   id: string;
@@ -21,119 +21,121 @@ interface Props {
   tours: MiniTour[];
 }
 
+const VISIBLE = 3;
+const GAP = 16; // px — gap-4
+
 export function HeroFeaturedCards({ tours }: Props) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [idx, setIdx] = useState(0);
+  const max = Math.max(0, tours.length - VISIBLE);
 
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
-  }, []);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", checkScroll, { passive: true });
-    checkScroll();
-    return () => el.removeEventListener("scroll", checkScroll);
-  }, [checkScroll]);
-
-  function scroll(dir: "left" | "right") {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir === "left" ? -340 : 340, behavior: "smooth" });
-  }
+  const prev = () => setIdx((i) => Math.max(0, i - 1));
+  const next = () => setIdx((i) => Math.min(max, i + 1));
 
   if (tours.length === 0) return null;
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(price);
 
+  // stride = (containerWidth + GAP) / VISIBLE
+  // In CSS: calc((100% + GAP px) / VISIBLE)
+  const strideCSS = `calc((100% + ${GAP}px) / ${VISIBLE})`;
+
   return (
-    <div className="mt-10 relative" id="hero-featured">
-      <p className="text-white/80 text-sm font-semibold text-center mb-4 tracking-wide">
+    <div className="mt-8 w-full">
+      <p className="text-center text-[13px] font-semibold text-white/80 mb-4 tracking-wide">
         Continue planning your trip
       </p>
 
-      <div className="relative group/cards">
-        {/* Right scroll arrow */}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll("right")}
-            className="absolute -right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center text-[#111] hover:bg-[#F8F7F5] transition-all opacity-0 group-hover/cards:opacity-100"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="size-4" />
-          </button>
-        )}
-
-        {/* Scrollable track */}
-        <div
-          ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      <div className="flex items-center gap-3">
+        {/* Left arrow */}
+        <button
+          onClick={prev}
+          disabled={idx === 0}
+          aria-label="Previous"
+          className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#111] text-xl shadow-md shrink-0 transition-opacity duration-200 disabled:opacity-30 hover:bg-[#F8F7F5] disabled:cursor-default"
         >
-          {tours.map((tour) => (
-            <Link
-              key={tour.id}
-              href={`/tours/${tour.slug}`}
-              className="flex-shrink-0 w-[300px] sm:w-[320px] snap-start group"
-            >
-              <div className="flex bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-shadow h-[100px]">
-                {/* Thumbnail — fixed square with proper image handling */}
-                <div className="w-[100px] h-[100px] shrink-0 overflow-hidden relative">
+          ‹
+        </button>
+
+        {/* Clipping window */}
+        <div className="flex-1 overflow-hidden">
+          {/* Sliding track */}
+          <div
+            className="flex transition-transform duration-300 ease-in-out"
+            style={{
+              gap: GAP,
+              transform: `translateX(calc(-${idx} * ${strideCSS}))`,
+            }}
+          >
+            {tours.map((tour) => (
+              <Link
+                key={tour.id}
+                href={`/tours/${tour.slug}`}
+                className="shrink-0 bg-white rounded-xl p-4 flex gap-4 items-start shadow-[0_2px_12px_rgba(0,0,0,0.10)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] transition-shadow group"
+                style={{ width: `calc((100% - ${(VISIBLE - 1) * GAP}px) / ${VISIBLE})` }}
+              >
+                {/* Thumbnail */}
+                <div className="w-28 h-28 rounded-lg overflow-hidden shrink-0">
                   {tour.coverImage ? (
                     <img
                       src={tour.coverImage}
                       alt={tour.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
+                      className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                     />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-4xl"
-                      style={{ background: "linear-gradient(135deg, #0C447C 0%, #185FA5 60%, #2980D4 100%)" }}
-                    >
-                      <span className="opacity-40">🗻</span>
-                    </div>
+                    <div
+                      className="w-full h-full"
+                      style={{ background: "linear-gradient(135deg, #0C447C 0%, #185FA5 100%)" }}
+                    />
                   )}
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0 px-4 py-3 flex flex-col justify-between">
-                  <div>
-                    <p className="text-[13px] font-bold text-[#191C20] leading-snug line-clamp-2 group-hover:text-[#185FA5] transition-colors">
-                      {tour.title}
-                    </p>
-                    <p className="text-[11px] text-[#7A746D] mt-1">
-                      {tour.duration} {tour.durationType} · {tour.location}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <div className="flex items-center gap-1.5">
-                      <div className="flex">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`size-3 ${
-                              i < Math.floor(tour.rating)
-                                ? "text-[#EF9F27] fill-[#EF9F27]"
-                                : "text-[#E4E0D9] fill-[#E4E0D9]"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-[10px] text-[#7A746D]">({tour.reviewCount})</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-bold text-[#111] leading-snug mb-1 line-clamp-2 group-hover:text-[#185FA5] transition-colors">
+                    {tour.title}
+                  </p>
+                  <p className="text-[12px] text-[#666] mb-1.5 line-clamp-1">
+                    {tour.duration} {tour.durationType} · {tour.location}
+                  </p>
+                  <div className="flex items-center gap-1 mb-1.5">
+                    <div className="flex">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`size-3 ${
+                            i < Math.floor(tour.rating)
+                              ? "text-[#EF9F27] fill-[#EF9F27]"
+                              : "text-[#E4E0D9] fill-[#E4E0D9]"
+                          }`}
+                        />
+                      ))}
                     </div>
-                    <div>
-                      <span className="text-[10px] text-[#A8A29E]">from </span>
-                      <span className="text-sm font-bold text-[#185FA5]">{formatPrice(tour.basePrice)}</span>
-                    </div>
+                    <span className="text-[11px] font-bold text-[#111]">{tour.rating}</span>
+                    <span className="text-[11px] text-[#999]">({tour.reviewCount.toLocaleString()})</span>
                   </div>
+                  <p className="text-[12px] text-[#555]">
+                    From{" "}
+                    <span className="font-extrabold text-[#EF9F27] text-[15px]">
+                      {formatPrice(tour.basePrice)}
+                    </span>
+                  </p>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
+
+        {/* Right arrow */}
+        <button
+          onClick={next}
+          disabled={idx >= max}
+          aria-label="Next"
+          className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#111] text-xl shadow-md shrink-0 transition-opacity duration-200 disabled:opacity-30 hover:bg-[#F8F7F5] disabled:cursor-default"
+        >
+          ›
+        </button>
       </div>
     </div>
   );

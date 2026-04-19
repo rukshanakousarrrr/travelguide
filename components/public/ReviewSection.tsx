@@ -118,7 +118,7 @@ export function ReviewSection({ tourId, reviews, currentUserId, averageRating, r
               rows={4}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Share your experience — what did you enjoy? What stood out? Would you recommend this tour?"
+              placeholder="Share your experience  what did you enjoy? What stood out? Would you recommend this tour?"
               className="w-full px-4 py-3 border border-[#E4E0D9] rounded-xl text-[#111] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#185FA5]/20 focus:border-[#185FA5] transition-all resize-none"
             />
             <p className="text-xs text-[#A8A29E] mt-1">{message.length} characters (minimum 10)</p>

@@ -46,11 +46,11 @@ export default function AboutPage() {
               At {COMPANY_NAME}, we go beyond the typical tourist trails. Our mission is to bridge the gap between curious travelers and rich Japanese culture. 
             </p>
             <p className="text-[#545454] text-lg leading-relaxed">
-              Whether you are tasting street food through the bustling alleys of Osaka, discovering serene, hidden temples in Kyoto, or photographing the neon glow of Tokyo — we ensure every moment is crafted with care and deep local knowledge.
+              Whether you are tasting street food through the bustling alleys of Osaka, discovering serene hidden temples in Kyoto, or photographing the neon glow of Tokyo, we ensure every moment is crafted with care and deep local knowledge.
             </p>
           </div>
           
-          <div className="relative h-[400px] w-full rounded-3xl overflow-hidden shadow-xl border-4 border-white">
+          <div className="relative h-100 w-full rounded-3xl overflow-hidden shadow-xl border-4 border-white">
             <div className="absolute inset-0 bg-[#0C447C]/10 z-10" />
             <img 
               src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?q=80&w=2070&auto=format&fit=crop" 

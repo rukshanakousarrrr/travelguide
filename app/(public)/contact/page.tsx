@@ -1,16 +1,16 @@
 import { ContactForm } from "@/components/public/ContactForm";
 import { COMPANY_EMAIL, COMPANY_PHONE, COMPANY_NAME } from "@/lib/constants";
-import { Mail, Phone, MapPin, Clock, MessageCircle, Star } from "lucide-react";
+import { Mail, Phone, MapPin, Clock } from "lucide-react";
 
 export const metadata = {
-  title: "Contact Us | " + COMPANY_NAME,
+  title: `Contact Us | ${COMPANY_NAME}`,
   description: "Get in touch with our team. We are here to help you plan your perfect Japan experience.",
 };
 
 const FAQS = [
   {
     q: "How far in advance should I book?",
-    a: "We recommend booking at least 2–4 weeks ahead, especially for popular tours during cherry blossom and autumn foliage seasons.",
+    a: "We recommend booking at least 2 to 4 weeks ahead, especially during cherry blossom and autumn foliage seasons.",
   },
   {
     q: "Can I customise a tour for my group?",
@@ -18,65 +18,42 @@ const FAQS = [
   },
   {
     q: "What is your cancellation policy?",
-    a: "Full refund for cancellations made 7+ days before the tour. Within 7 days, a 50% fee applies. No-shows are non-refundable.",
+    a: "Full refund for cancellations made 7 or more days before the tour. Within 7 days, a 50% fee applies. No-shows are non-refundable.",
   },
   {
     q: "Do your guides speak English?",
-    a: "Yes — all our guides are fluent English speakers, and many also speak Mandarin, Spanish, or French.",
+    a: "Yes, all our guides are fluent English speakers. Many also speak Mandarin, Spanish, or French.",
   },
 ];
 
 export default function ContactPage() {
   return (
-    <div className="bg-[#F8F9FF] min-h-screen pt-24 md:pt-28">
+    <div className="bg-white min-h-screen pt-14">
 
-      {/* ── Hero banner ─────────────────────────────── */}
-      <div className="relative bg-[#0C447C] overflow-hidden">
-        {/* subtle pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%)",
-            backgroundSize: "20px 20px",
-          }}
-        />
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-16 md:py-20">
-          <p className="text-[#EF9F27] font-bold text-xs uppercase tracking-widest mb-3">
-            Get in touch
+      {/* Page header */}
+      <div className="border-b border-[#E4E0D9] bg-[#F8F7F5]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 text-center">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[#185FA5] mb-3">
+            Get in Touch
           </p>
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-white leading-tight mb-4">
-            We would love to hear<br className="hidden md:block" /> from you
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-[#111] mb-4 leading-tight">
+            We would love to hear from you
           </h1>
-          <p className="text-white/70 text-lg max-w-xl">
-            Whether you have a question about a tour, need help with a booking, or simply want to say hello — our team is here.
+          <p className="text-[#7A746D] text-lg max-w-xl mx-auto">
+            Whether you have a question about a tour, need help with a booking, or simply want to say hello, our team is here.
           </p>
-
-          {/* trust badges */}
-          <div className="flex flex-wrap items-center gap-6 mt-8">
-            {[
-              { label: "Reply within 24 h", icon: Clock },
-              { label: "Friendly team", icon: MessageCircle },
-              { label: "Rated 4.9 / 5", icon: Star },
-            ].map(({ label, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-2 text-white/60 text-sm">
-                <Icon className="size-4 text-[#EF9F27]" />
-                {label}
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* ── Main content ────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+      {/* Main content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-14">
 
-          {/* ── Left: contact info ─────────────────── */}
+          {/* Left: contact info + quick FAQs */}
           <div className="lg:col-span-2 space-y-8">
 
             {/* Info cards */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[
                 {
                   icon: Mail,
@@ -91,7 +68,7 @@ export default function ContactPage() {
                         icon: Phone,
                         label: "Call us",
                         value: COMPANY_PHONE,
-                        sub: "Mon – Sat, 9 am – 6 pm JST",
+                        sub: "Mon to Sat, 9 am to 6 pm JST",
                         href: "tel:" + COMPANY_PHONE,
                       },
                     ]
@@ -113,13 +90,13 @@ export default function ContactPage() {
               ].map(({ icon: Icon, label, value, sub, href }) => (
                 <div
                   key={label}
-                  className="bg-white rounded-2xl border border-[#E7E8EE] p-5 flex items-start gap-4 shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl border border-[#E4E0D9] p-5 flex items-start gap-4"
                 >
                   <div className="w-10 h-10 rounded-xl bg-[#EEF4FB] flex items-center justify-center shrink-0">
                     <Icon className="size-5 text-[#185FA5]" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-[#7A746D] mb-0.5">{label}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#A8A29E] mb-0.5">{label}</p>
                     {href ? (
                       <a href={href} className="font-semibold text-[#111] hover:text-[#185FA5] transition-colors text-sm">
                         {value}
@@ -127,30 +104,37 @@ export default function ContactPage() {
                     ) : (
                       <p className="font-semibold text-[#111] text-sm">{value}</p>
                     )}
-                    <p className="text-xs text-[#7A746D] mt-0.5">{sub}</p>
+                    <p className="text-xs text-[#A8A29E] mt-0.5">{sub}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* FAQ */}
+            {/* Quick FAQs */}
             <div>
-              <h2 className="text-xl font-bold font-display text-[#111] mb-5">Common questions</h2>
-              <div className="space-y-4">
+              <h2 className="font-display text-lg font-bold text-[#111] mb-4">Common questions</h2>
+              <div className="space-y-3">
                 {FAQS.map((faq) => (
-                  <div key={faq.q} className="bg-white rounded-xl border border-[#E7E8EE] p-5 shadow-sm">
+                  <div key={faq.q} className="bg-[#F8F7F5] rounded-xl border border-[#E4E0D9] p-5">
                     <p className="font-semibold text-[#111] text-sm mb-1.5">{faq.q}</p>
-                    <p className="text-sm text-[#545454] leading-relaxed">{faq.a}</p>
+                    <p className="text-sm text-[#7A746D] leading-relaxed">{faq.a}</p>
                   </div>
                 ))}
               </div>
+              <p className="mt-4 text-xs text-[#A8A29E]">
+                More questions?{" "}
+                <a href="/faq" className="text-[#185FA5] font-semibold hover:underline">
+                  Visit our full FAQ page
+                </a>
+              </p>
             </div>
+
           </div>
 
-          {/* ── Right: form ────────────────────────── */}
+          {/* Right: form */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-2xl border border-[#E7E8EE] shadow-sm p-8 md:p-10">
-              <h2 className="text-2xl font-bold font-display text-[#111] mb-1">Send us a message</h2>
+            <div className="bg-white rounded-2xl border border-[#E4E0D9] p-8 md:p-10">
+              <h2 className="font-display text-2xl font-bold text-[#111] mb-1">Send us a message</h2>
               <p className="text-[#7A746D] text-sm mb-8">
                 Fill in the form and a member of our team will get back to you shortly.
               </p>

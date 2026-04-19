@@ -3,9 +3,9 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, MapPin, Heart, User, LogIn, LogOut, Bell, HelpCircle, ChevronRight, Ticket, Globe, ChevronDown, Search } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, X, MapPin, Heart, User, LogIn, LogOut, Bell, HelpCircle, ChevronRight, Ticket, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAV_LINKS } from "@/lib/constants";
 import { signOut } from "next-auth/react";
 
 interface DestinationNav {
@@ -21,6 +21,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ transparent = false, isLoggedIn = false, destinations = [] }: NavbarProps) {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -47,6 +48,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
   }, [profileMenuOpen]);
 
   const activeDest = destinations.find((d) => d.id === activeDestId) ?? destinations[0] ?? null;
+  const isToursActive = pathname?.startsWith("/tours");
 
   return (
     <header
@@ -54,59 +56,66 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
           ? "bg-white/98 backdrop-blur-md shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-          : "bg-white"
+          : "bg-white border-b border-[#E4E0D9]"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[72px]">
+        <div className="flex items-center justify-between h-[56px]">
 
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
             <Image
               src="/asstes/logoo.PNG"
               alt="GoTripJapan"
-              width={240}
-              height={60}
-              className="h-16 w-auto object-contain"
+              width={200}
+              height={50}
+              className="h-[38px] w-auto object-contain"
               priority
             />
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-4 py-2 text-sm font-medium text-[#191C20] rounded-lg transition-colors duration-150 hover:bg-[#F2F3FA] hover:text-[#185FA5]"
+          {/* Desktop tab nav */}
+          <nav className="hidden md:flex items-center gap-0 ml-8">
+            {/* Destinations tab */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  const next = !destOpen;
+                  setDestOpen(next);
+                  if (next && destinations.length > 0) setActiveDestId(destinations[0].id);
+                }}
+                className={cn(
+                  "flex items-center gap-1.5 px-4 py-2 text-[13px] font-medium border-b-2 transition-all duration-150",
+                  destOpen
+                    ? "text-[#185FA5] border-[#185FA5]"
+                    : "text-[#444] border-transparent hover:text-[#185FA5]"
+                )}
+                style={{ marginBottom: -1 }}
               >
-                {link.label}
-              </Link>
-            ))}
+                Destinations
+                <ChevronDown className={cn("size-3.5 transition-transform duration-150", destOpen && "rotate-180")} />
+              </button>
+            </div>
 
-            {/* Destinations mega-dropdown */}
-            {destinations.length > 0 && (
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    const next = !destOpen;
-                    setDestOpen(next);
-                    if (next && destinations.length > 0) setActiveDestId(destinations[0].id);
-                  }}
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[#191C20] rounded-lg transition-colors duration-150 hover:bg-[#F2F3FA] hover:text-[#185FA5]"
-                >
-                  <Globe className="size-4" />
-                  Destinations
-                  <ChevronDown className={cn("size-3.5 transition-transform duration-150", destOpen && "rotate-180")} />
-                </button>
-              </div>
-            )}
+            {/* Tours tab */}
+            <Link
+              href="/tours"
+              className={cn(
+                "px-4 py-2 text-[13px] font-medium border-b-2 transition-all duration-150",
+                isToursActive
+                  ? "text-[#185FA5] border-[#185FA5]"
+                  : "text-[#444] border-transparent hover:text-[#185FA5]"
+              )}
+              style={{ marginBottom: -1 }}
+            >
+              Tours
+            </Link>
           </nav>
 
-          {/* Desktop CTA area */}
+          {/* Desktop right icons */}
           <div className="hidden md:flex items-center gap-5">
             {isLoggedIn && (
-              <Link href="/bookings" className="group flex flex-col items-center justify-center gap-0.5 transition-colors relative">
+              <Link href="/bookings" className="group flex flex-col items-center justify-center gap-0.5 transition-colors">
                 <Ticket className="size-5 text-[#191C20] group-hover:text-[#185FA5] transition-colors" />
                 <span className="text-[10px] font-semibold text-[#191C20] group-hover:text-[#185FA5] tracking-wide transition-colors">
                   Bookings
@@ -114,7 +123,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
               </Link>
             )}
 
-            <Link href="/wishlist" className="group flex flex-col items-center justify-center gap-0.5 transition-colors relative">
+            <Link href="/wishlist" className="group flex flex-col items-center justify-center gap-0.5 transition-colors">
               <Heart className="size-5 text-[#191C20] group-hover:text-[#185FA5] transition-colors" />
               <span className="text-[10px] font-semibold text-[#191C20] group-hover:text-[#185FA5] tracking-wide transition-colors">
                 Wishlist
@@ -124,7 +133,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="group flex flex-col items-center justify-center gap-0.5 transition-colors relative"
+                className="group flex flex-col items-center justify-center gap-0.5 transition-colors"
               >
                 <User className="size-5 text-[#191C20] group-hover:text-[#185FA5] transition-colors" />
                 <span className="text-[10px] font-semibold text-[#191C20] group-hover:text-[#185FA5] tracking-wide transition-colors">
@@ -193,25 +202,23 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
         </div>
       </div>
 
-      {/* Mega dropdown — rendered outside the nav flow to avoid stacking context issues */}
+      {/* Mega dropdown */}
       {destOpen && destinations.length > 0 && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-40"
-            style={{ top: 72 }}
+            style={{ top: 56 }}
             onClick={() => setDestOpen(false)}
           />
-          {/* Panel */}
           <div
             className="fixed left-0 right-0 z-50 bg-white"
-            style={{ top: 72, boxShadow: "0 12px 40px -4px rgba(25,28,32,0.08)" }}
+            style={{ top: 56, boxShadow: "0 12px 40px -4px rgba(25,28,32,0.08)" }}
           >
             <div className="max-w-7xl mx-auto flex" style={{ minHeight: 340 }}>
               {/* Left tabs */}
               <div className="w-52 shrink-0 border-r border-[#E7E8EE] py-4">
                 <p className="px-5 pb-3 text-[10px] font-bold uppercase tracking-widest text-[#185FA5]">
-                  Top attractions
+                  Top destinations
                 </p>
                 {destinations.map((dest) => (
                   <button
@@ -273,16 +280,13 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-[#E7E8EE] animate-fade-in">
           <div className="px-4 py-3 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-4 py-2.5 text-sm font-medium text-[#191C20] rounded-lg hover:bg-[#F2F3FA]"
-                onClick={() => setMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            <Link
+              href="/tours"
+              className="px-4 py-2.5 text-sm font-medium text-[#191C20] rounded-lg hover:bg-[#F2F3FA]"
+              onClick={() => setMenuOpen(false)}
+            >
+              Tours
+            </Link>
 
             {destinations.length > 0 && (
               <div className="pt-1">

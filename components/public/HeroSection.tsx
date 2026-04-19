@@ -24,8 +24,9 @@ export function HeroSection({ featuredTours = [] }: Props) {
       {/* Single background image — Mt. Fuji */}
       <div className="absolute inset-0">
         <img
-          src="/asstes/hero-fuji.png"
+          src="/asstes/hero-mt.jpg"
           alt="Mount Fuji at dawn"
+          fetchPriority="high"
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Cinematic overlay */}
@@ -55,10 +56,6 @@ export function HeroSection({ featuredTours = [] }: Props) {
             </span>
           </h1>
 
-          <p className="text-white/70 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Browse 50+ handcrafted tours — from Tokyo street food to Kyoto tea ceremonies.
-            Book instantly, cancel freely.
-          </p>
         </div>
 
         {/* Search bar */}
@@ -70,18 +67,6 @@ export function HeroSection({ featuredTours = [] }: Props) {
         )}
       </div>
 
-      {/* Elegant wave transition */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 leading-0">
-        <svg
-          viewBox="0 0 1440 80"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-          className="block w-full h-16 sm:h-20"
-          style={{ fill: "#FFFFFF" }}
-        >
-          <path d="M0,80 C240,25 480,55 720,35 C960,15 1200,50 1440,30 L1440,80 Z" />
-        </svg>
-      </div>
     </section>
   );
 }
