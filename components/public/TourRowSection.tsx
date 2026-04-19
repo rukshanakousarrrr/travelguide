@@ -1,9 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { WishlistButton } from "./WishlistButton";
+
+function useVisible() {
+  const [visible, setVisible] = useState(() => {
+    if (typeof window === "undefined") return 4;
+    const w = window.innerWidth;
+    if (w >= 1024) return 4;
+    if (w >= 768) return 3;
+    if (w >= 640) return 2;
+    return 1;
+  });
+  useEffect(() => {
+    function update() {
+      const w = window.innerWidth;
+      if (w >= 1024) setVisible(4);
+      else if (w >= 768) setVisible(3);
+      else if (w >= 640) setVisible(2);
+      else setVisible(1);
+    }
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return visible;
+}
 
 export interface RowTour {
   id: string;
@@ -29,12 +52,12 @@ interface Props {
   seeAllHref?: string;
 }
 
-const VISIBLE = 4;
 const GAP = 16; // px — matches gap-4
 
 export function TourRowSection({ title, subtitle, tours, seeAllHref = "/tours" }: Props) {
+  const visible = useVisible();
   const [idx, setIdx] = useState(0);
-  const max = Math.max(0, tours.length - VISIBLE);
+  const max = Math.max(0, tours.length - visible);
 
   const prev = () => setIdx((i) => Math.max(0, i - 1));
   const next = () => setIdx((i) => Math.min(max, i + 1));
@@ -44,8 +67,7 @@ export function TourRowSection({ title, subtitle, tours, seeAllHref = "/tours" }
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(price);
 
-  // stride = (containerWidth + gap) / 4  →  in CSS: 25% + gap/4 px
-  const strideCSS = `calc(25% + ${GAP / VISIBLE}px)`;
+  const strideCSS = `calc(${100 / visible}% + ${GAP / visible}px)`;
 
   return (
     <section className="py-8 border-b border-[#e8e8e8]">
@@ -91,7 +113,7 @@ export function TourRowSection({ title, subtitle, tours, seeAllHref = "/tours" }
               <div
                 key={tour.id}
                 className="shrink-0"
-                style={{ width: `calc((100% - ${(VISIBLE - 1) * GAP}px) / ${VISIBLE})` }}
+                style={{ width: `calc((100% - ${(visible - 1) * GAP}px) / ${visible})` }}
               >
                 <TourCard tour={tour} formatPrice={formatPrice} />
               </div>
@@ -136,7 +158,7 @@ function TourCard({ tour, formatPrice }: { tour: RowTour; formatPrice: (p: numbe
         )}
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
 
         {/* Badges */}
         {tour.likelyToSellOut && (
@@ -147,7 +169,7 @@ function TourCard({ tour, formatPrice }: { tour: RowTour; formatPrice: (p: numbe
 
         {/* Wishlist */}
         <div className="absolute top-2 right-2 z-10">
-          <WishlistButton tourId={tour.id} isWishlistedInitial={tour.isWishlisted ?? false} className="!w-7 !h-7" />
+          <WishlistButton tourId={tour.id} isWishlistedInitial={tour.isWishlisted ?? false} className="w-7!   " />
         </div>
       </div>
 

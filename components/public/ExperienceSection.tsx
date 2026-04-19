@@ -90,7 +90,7 @@ export function ExperienceSection() {
             <Link
               key={cat.title}
               href={cat.href}
-              className="group flex flex-col items-center text-center p-6 rounded-2xl bg-[#F8F9FF] hover:bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-300"
+              className="group flex flex-col items-center text-center p-4 sm:p-6 rounded-2xl bg-[#F8F9FF] hover:bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-300"
             >
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform duration-300"

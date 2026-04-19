@@ -1,8 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star } from "lucide-react";
+
+function useVisible() {
+  const [visible, setVisible] = useState(() => {
+    if (typeof window === "undefined") return 3;
+    const w = window.innerWidth;
+    if (w >= 1024) return 3;
+    if (w >= 640) return 2;
+    return 1;
+  });
+  useEffect(() => {
+    function update() {
+      const w = window.innerWidth;
+      if (w >= 1024) setVisible(3);
+      else if (w >= 640) setVisible(2);
+      else setVisible(1);
+    }
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return visible;
+}
 
 interface MiniTour {
   id: string;
@@ -21,12 +42,12 @@ interface Props {
   tours: MiniTour[];
 }
 
-const VISIBLE = 3;
 const GAP = 16; // px — gap-4
 
 export function HeroFeaturedCards({ tours }: Props) {
+  const visible = useVisible();
   const [idx, setIdx] = useState(0);
-  const max = Math.max(0, tours.length - VISIBLE);
+  const max = Math.max(0, tours.length - visible);
 
   const prev = () => setIdx((i) => Math.max(0, i - 1));
   const next = () => setIdx((i) => Math.min(max, i + 1));
@@ -36,9 +57,7 @@ export function HeroFeaturedCards({ tours }: Props) {
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(price);
 
-  // stride = (containerWidth + GAP) / VISIBLE
-  // In CSS: calc((100% + GAP px) / VISIBLE)
-  const strideCSS = `calc((100% + ${GAP}px) / ${VISIBLE})`;
+  const strideCSS = `calc((100% + ${GAP}px) / ${visible})`;
 
   return (
     <div className="mt-8 w-full">
@@ -72,7 +91,7 @@ export function HeroFeaturedCards({ tours }: Props) {
                 key={tour.id}
                 href={`/tours/${tour.slug}`}
                 className="shrink-0 bg-white rounded-xl p-4 flex gap-4 items-start shadow-[0_2px_12px_rgba(0,0,0,0.10)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] transition-shadow group"
-                style={{ width: `calc((100% - ${(VISIBLE - 1) * GAP}px) / ${VISIBLE})` }}
+                style={{ width: `calc((100% - ${(visible - 1) * GAP}px) / ${visible})` }}
               >
                 {/* Thumbnail */}
                 <div className="w-28 h-28 rounded-lg overflow-hidden shrink-0">

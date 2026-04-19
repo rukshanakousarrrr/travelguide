@@ -125,7 +125,7 @@ export function WhyUsSection({ reviews, avgRating, totalReviews }: Props) {
             {TRUST_ITEMS.map(({ icon: Icon, title, description, accent, bgLight }) => (
               <div
                 key={title}
-                className="flex flex-col items-center text-center p-6 bg-white rounded-2xl hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-300 group"
+                className="flex flex-col items-center text-center p-4 sm:p-6 bg-white rounded-2xl hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-300 group"
               >
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300"

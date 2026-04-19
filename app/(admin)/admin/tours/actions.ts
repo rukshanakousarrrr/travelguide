@@ -4,7 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-function clearToursCache() { revalidateTag("tours", "default"); }
+function clearToursCache() {
+  revalidateTag("tours");
+  revalidatePath("/tours");
+  revalidatePath("/");
+}
 import { slugify } from "@/lib/utils";
 
 /** Safely parse a JSON string — never throws, always returns a valid array */
@@ -151,11 +155,13 @@ export async function saveTourAction(formData: FormData): Promise<ActionResult> 
       clearToursCache();
       revalidatePath("/admin/tours");
       revalidatePath(`/admin/tours/${tourId}`);
+      revalidatePath(`/tours/${slug}`);
       return { success: "Tour updated successfully.", tourId: tourId };
     } else {
       const tour = await prisma.tour.create({ data });
       clearToursCache();
       revalidatePath("/admin/tours");
+      revalidatePath(`/tours/${tour.slug}`);
       return { success: "Tour created successfully.", tourId: tour.id };
     }
   } catch (e: any) {
@@ -186,12 +192,19 @@ export async function toggleTourStatusAction(
 ): Promise<ActionResult> {
   await assertAdmin();
   try {
+    const existing = await prisma.tour.findUnique({
+      where: { id: tourId },
+      select: { slug: true },
+    });
     await prisma.tour.update({
       where: { id: tourId },
       data:  { status: newStatus },
     });
     clearToursCache();
     revalidatePath("/admin/tours");
+    if (existing?.slug) {
+      revalidatePath(`/tours/${existing.slug}`);
+    }
     return { success: `Tour status changed to ${newStatus.toLowerCase()}.` };
   } catch {
     return { error: "Failed to update status." };

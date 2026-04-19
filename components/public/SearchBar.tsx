@@ -44,11 +44,11 @@ export function SearchBar() {
           />
         </div>
 
-        {/* Divider */}
-        <div className="w-px h-7 bg-[#E4E0D9] shrink-0" />
+        {/* Divider — hidden on mobile */}
+        <div className="hidden sm:block w-px h-7 bg-[#E4E0D9] shrink-0" />
 
-        {/* Date dropdown */}
-        <div className="relative" ref={dateRef}>
+        {/* Date dropdown — hidden on mobile */}
+        <div className="hidden sm:block relative" ref={dateRef}>
           <button
             type="button"
             onClick={() => { setShowDateMenu(!showDateMenu); setShowGuestsMenu(false); }}
@@ -75,11 +75,11 @@ export function SearchBar() {
           )}
         </div>
 
-        {/* Divider */}
-        <div className="w-px h-7 bg-[#E4E0D9] shrink-0" />
+        {/* Divider — hidden on mobile */}
+        <div className="hidden sm:block w-px h-7 bg-[#E4E0D9] shrink-0" />
 
-        {/* Guests dropdown */}
-        <div className="relative" ref={guestsRef}>
+        {/* Guests dropdown — hidden on mobile */}
+        <div className="hidden sm:block relative" ref={guestsRef}>
           <button
             type="button"
             onClick={() => { setShowGuestsMenu(!showGuestsMenu); setShowDateMenu(false); }}

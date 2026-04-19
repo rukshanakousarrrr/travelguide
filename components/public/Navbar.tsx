@@ -60,7 +60,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[56px]">
+        <div className="flex items-center justify-between h-14">
 
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
@@ -69,7 +69,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
               alt="GoTripJapan"
               width={200}
               height={50}
-              className="h-[38px] w-auto object-contain"
+              className="h-9.5 w-auto object-contain"
               priority
             />
           </Link>
