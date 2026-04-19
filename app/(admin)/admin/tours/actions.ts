@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 function clearToursCache() {
-  revalidateTag("tours");
+  revalidateTag("tours", "default");
   revalidatePath("/tours");
   revalidatePath("/");
 }
