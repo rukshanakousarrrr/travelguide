@@ -19,12 +19,21 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
+  const from = process.env.SMTP_FROM ?? COMPANY_EMAIL;
   return transporter.sendMail({
-    from: `"${COMPANY_NAME}" <${process.env.SMTP_FROM ?? COMPANY_EMAIL}>`,
+    from:       `"${COMPANY_NAME}" <${from}>`,
+    replyTo:    from,
     to,
     subject,
     html,
-    text,
+    // Always include plain-text fallback — spam filters penalise HTML-only emails
+    text: text ?? html.replace(/<[^>]+>/g, " ").replace(/\s{2,}/g, " ").trim(),
+    headers: {
+      "X-Mailer":        "GoTripJapan Mailer",
+      "X-Priority":      "3",
+      "Precedence":      "bulk",
+      "List-Unsubscribe": `<mailto:${from}?subject=unsubscribe>`,
+    },
   });
 }
 
