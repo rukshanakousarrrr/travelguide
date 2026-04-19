@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, MapPin, Heart, User, LogIn, LogOut, Bell, HelpCircle, ChevronRight, Ticket, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, MapPin, Heart, User, LogIn, LogOut, Bell, HelpCircle, ChevronRight, Ticket, Globe, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_LINKS } from "@/lib/constants";
 import { signOut } from "next-auth/react";
@@ -29,11 +29,10 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!transparent) return;
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [transparent]);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -47,34 +46,30 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [profileMenuOpen]);
 
-  const isWhite = !transparent || scrolled;
-
   const activeDest = destinations.find((d) => d.id === activeDestId) ?? destinations[0] ?? null;
 
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isWhite
-          ? "bg-white/95 backdrop-blur-md border-b border-border shadow-sm"
-          : "bg-transparent"
+        scrolled
+          ? "bg-white/98 backdrop-blur-md shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+          : "bg-white"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 py-3">
+        <div className="flex items-center justify-between h-[72px]">
 
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
-            <div className={cn(!isWhite && "bg-white/90 backdrop-blur-sm rounded-xl px-2 py-1")}>
-              <Image
-                src="/asstes/logoo.PNG"
-                alt="GoTripJapan"
-                width={200}
-                height={50}
-                className="h-14 w-auto object-contain"
-                priority
-              />
-            </div>
+            <Image
+              src="/asstes/logoo.PNG"
+              alt="GoTripJapan"
+              width={240}
+              height={60}
+              className="h-16 w-auto object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop nav */}
@@ -83,12 +78,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
               <Link
                 key={link.href}
                 href={link.href}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-150",
-                  isWhite
-                    ? "text-foreground hover:bg-surface hover:text-primary"
-                    : "text-white/90 hover:text-white hover:bg-white/10"
-                )}
+                className="px-4 py-2 text-sm font-medium text-[#191C20] rounded-lg transition-colors duration-150 hover:bg-[#F2F3FA] hover:text-[#185FA5]"
               >
                 {link.label}
               </Link>
@@ -103,12 +93,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                     setDestOpen(next);
                     if (next && destinations.length > 0) setActiveDestId(destinations[0].id);
                   }}
-                  className={cn(
-                    "flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-150",
-                    isWhite
-                      ? "text-foreground hover:bg-surface hover:text-primary"
-                      : "text-white/90 hover:text-white hover:bg-white/10"
-                  )}
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[#191C20] rounded-lg transition-colors duration-150 hover:bg-[#F2F3FA] hover:text-[#185FA5]"
                 >
                   <Globe className="size-4" />
                   Destinations
@@ -118,20 +103,20 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
             )}
           </nav>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* Desktop CTA area */}
+          <div className="hidden md:flex items-center gap-5">
             {isLoggedIn && (
-              <Link href="/bookings" className="group flex flex-col items-center justify-center gap-1 transition-colors relative">
-                <Ticket className={cn("size-5.5", isWhite ? "text-[#111111]" : "text-white")} />
-                <span className={cn("text-[11px] font-bold tracking-wide", isWhite ? "text-[#111111]" : "text-white")}>
+              <Link href="/bookings" className="group flex flex-col items-center justify-center gap-0.5 transition-colors relative">
+                <Ticket className="size-5 text-[#191C20] group-hover:text-[#185FA5] transition-colors" />
+                <span className="text-[10px] font-semibold text-[#191C20] group-hover:text-[#185FA5] tracking-wide transition-colors">
                   Bookings
                 </span>
               </Link>
             )}
 
-            <Link href="/wishlist" className="group flex flex-col items-center justify-center gap-1 transition-colors relative">
-              <Heart className={cn("size-5.5", isWhite ? "text-[#111111]" : "text-white")} />
-              <span className={cn("text-[11px] font-bold tracking-wide", isWhite ? "text-[#111111]" : "text-white")}>
+            <Link href="/wishlist" className="group flex flex-col items-center justify-center gap-0.5 transition-colors relative">
+              <Heart className="size-5 text-[#191C20] group-hover:text-[#185FA5] transition-colors" />
+              <span className="text-[10px] font-semibold text-[#191C20] group-hover:text-[#185FA5] tracking-wide transition-colors">
                 Wishlist
               </span>
             </Link>
@@ -139,31 +124,31 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="group flex flex-col items-center justify-center gap-1 transition-colors relative"
+                className="group flex flex-col items-center justify-center gap-0.5 transition-colors relative"
               >
-                <User className={cn("size-5.5", isWhite ? "text-[#111111]" : "text-white")} />
-                <span className={cn("text-[11px] font-bold tracking-wide", isWhite ? "text-[#111111]" : "text-white")}>
+                <User className="size-5 text-[#191C20] group-hover:text-[#185FA5] transition-colors" />
+                <span className="text-[10px] font-semibold text-[#191C20] group-hover:text-[#185FA5] tracking-wide transition-colors">
                   Profile
                 </span>
                 {profileMenuOpen && (
-                  <div className="absolute -bottom-2.25 left-0 right-0 h-0.5 bg-[#C41230]" />
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#185FA5] rounded-full" />
                 )}
               </button>
 
               {profileMenuOpen && (
-                <div className="absolute top-10.5 right-0 w-70 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-[#E4E0D9] overflow-hidden animate-zoom-in origin-top-right text-[#111111]">
+                <div className="absolute top-11 right-0 w-72 bg-white rounded-2xl shadow-[0_12px_40px_rgba(25,28,32,0.08)] overflow-hidden animate-zoom-in origin-top-right text-[#191C20]">
                   <div className="px-5 py-4">
-                    <h3 className="text-[17px] font-extrabold" style={{ fontFamily: "var(--font-sans)" }}>Profile</h3>
+                    <h3 className="text-base font-bold" style={{ fontFamily: "var(--font-sans)" }}>Profile</h3>
                   </div>
                   <div className="flex flex-col py-1">
                     {!isLoggedIn ? (
                       <Link
                         href="?auth=login"
                         onClick={() => setProfileMenuOpen(false)}
-                        className="flex items-center gap-4 px-5 py-3 hover:bg-[#F8F7F5] transition-colors"
+                        className="flex items-center gap-4 px-5 py-3 hover:bg-[#F2F3FA] transition-colors"
                       >
-                        <LogIn className="size-5.5" />
-                        <span className="text-[15px] font-semibold">Log in or sign up</span>
+                        <LogIn className="size-5" />
+                        <span className="text-sm font-semibold">Log in or sign up</span>
                       </Link>
                     ) : (
                       <button
@@ -171,24 +156,24 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                           setProfileMenuOpen(false);
                           signOut({ callbackUrl: "/" });
                         }}
-                        className="flex items-center gap-4 px-5 py-3 hover:bg-[#FEE2E2] hover:text-[#C41230] transition-colors w-full text-left"
+                        className="flex items-center gap-4 px-5 py-3 hover:bg-[#FEE2E2] hover:text-[#DC2626] transition-colors w-full text-left"
                       >
-                        <LogOut className="size-5.5" />
-                        <span className="text-[15px] font-semibold">Log out</span>
+                        <LogOut className="size-5" />
+                        <span className="text-sm font-semibold">Log out</span>
                       </button>
                     )}
-                    <div className="h-px bg-[#E4E0D9] mx-5 my-2" />
-                    <button className="flex items-center justify-between px-5 py-3 hover:bg-[#F8F7F5] transition-colors w-full text-left">
+                    <div className="h-px bg-[#E7E8EE] mx-5 my-2" />
+                    <button className="flex items-center justify-between px-5 py-3 hover:bg-[#F2F3FA] transition-colors w-full text-left">
                       <div className="flex items-center gap-4">
-                        <Bell className="size-5.5" />
-                        <span className="text-[15px] font-semibold">Updates</span>
+                        <Bell className="size-5" />
+                        <span className="text-sm font-semibold">Updates</span>
                       </div>
-                      <ChevronRight className="size-4.5 text-[#A8A29E]" />
+                      <ChevronRight className="size-4 text-[#A8A29E]" />
                     </button>
-                    <div className="h-px bg-[#E4E0D9] mx-5 my-2" />
-                    <button className="flex items-center gap-4 px-5 py-3 hover:bg-[#F8F7F5] transition-colors w-full text-left">
-                      <HelpCircle className="size-5.5" />
-                      <span className="text-[15px] font-semibold">Support</span>
+                    <div className="h-px bg-[#E7E8EE] mx-5 my-2" />
+                    <button className="flex items-center gap-4 px-5 py-3 hover:bg-[#F2F3FA] transition-colors w-full text-left">
+                      <HelpCircle className="size-5" />
+                      <span className="text-sm font-semibold">Support</span>
                     </button>
                   </div>
                   <div className="h-2" />
@@ -199,10 +184,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
 
           {/* Mobile menu toggle */}
           <button
-            className={cn(
-              "md:hidden p-2 rounded-lg transition-colors",
-              isWhite ? "text-foreground hover:bg-surface" : "text-white hover:bg-white/10"
-            )}
+            className="md:hidden p-2 rounded-lg text-[#191C20] hover:bg-[#F2F3FA] transition-colors"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="Toggle menu"
           >
@@ -222,13 +204,13 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
           />
           {/* Panel */}
           <div
-            className="fixed left-0 right-0 z-50 bg-white border-b border-[#E4E0D9]"
-            style={{ top: 72, boxShadow: "0 8px 32px -4px rgba(0,0,0,0.12)" }}
+            className="fixed left-0 right-0 z-50 bg-white"
+            style={{ top: 72, boxShadow: "0 12px 40px -4px rgba(25,28,32,0.08)" }}
           >
             <div className="max-w-7xl mx-auto flex" style={{ minHeight: 340 }}>
               {/* Left tabs */}
-              <div className="w-52 shrink-0 border-r border-[#E4E0D9] py-4">
-                <p className="px-5 pb-3 text-[10px] font-bold uppercase tracking-widest text-[#C41230]">
+              <div className="w-52 shrink-0 border-r border-[#E7E8EE] py-4">
+                <p className="px-5 pb-3 text-[10px] font-bold uppercase tracking-widest text-[#185FA5]">
                   Top attractions
                 </p>
                 {destinations.map((dest) => (
@@ -239,8 +221,8 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                     className={cn(
                       "w-full text-left px-5 py-2.5 text-sm font-medium transition-colors",
                       (activeDestId ?? destinations[0]?.id) === dest.id
-                        ? "text-[#C41230] font-semibold bg-[#FFF5F6]"
-                        : "text-[#333] hover:bg-[#F8F7F5]"
+                        ? "text-[#185FA5] font-semibold bg-[#E6F1FB]"
+                        : "text-[#191C20] hover:bg-[#F2F3FA]"
                     )}
                   >
                     {dest.name}
@@ -257,9 +239,9 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                         key={place.id}
                         href={"/tours?q=" + encodeURIComponent(place.linkQuery ?? place.name)}
                         onClick={() => setDestOpen(false)}
-                        className="flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-[#F8F7F5] transition-colors group"
+                        className="flex items-center gap-3 py-2.5 px-2 rounded-xl hover:bg-[#F2F3FA] transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-md shrink-0 overflow-hidden bg-[#E4E0D9]">
+                        <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-[#E7E8EE]">
                           {place.imageUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" />
@@ -270,7 +252,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-[#111] leading-snug group-hover:text-[#C41230] transition-colors truncate">
+                          <p className="text-sm font-semibold text-[#191C20] leading-snug group-hover:text-[#185FA5] transition-colors truncate">
                             {place.name}
                           </p>
                           {place.subtitle && (
@@ -289,13 +271,13 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-border animate-fade-in">
+        <div className="md:hidden bg-white border-t border-[#E7E8EE] animate-fade-in">
           <div className="px-4 py-3 flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2.5 text-sm font-medium text-foreground rounded-lg hover:bg-surface"
+                className="px-4 py-2.5 text-sm font-medium text-[#191C20] rounded-lg hover:bg-[#F2F3FA]"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -304,7 +286,7 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
 
             {destinations.length > 0 && (
               <div className="pt-1">
-                <p className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#C41230]">Destinations</p>
+                <p className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#185FA5]">Destinations</p>
                 {destinations.map((dest) => (
                   <div key={dest.id}>
                     <p className="px-4 pt-2 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-[#7A746D]">{dest.name}</p>
@@ -313,9 +295,9 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                         key={place.id}
                         href={"/tours?q=" + encodeURIComponent(place.linkQuery ?? place.name)}
                         onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-foreground hover:bg-surface rounded-lg"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-[#191C20] hover:bg-[#F2F3FA] rounded-lg"
                       >
-                        <MapPin className="size-4 text-[#C41230] shrink-0" />
+                        <MapPin className="size-4 text-[#185FA5] shrink-0" />
                         {place.name}
                       </Link>
                     ))}
@@ -324,30 +306,30 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
               </div>
             )}
 
-            <div className="pt-2 mt-1 border-t border-border flex flex-col gap-2">
+            <div className="pt-2 mt-1 border-t border-[#E7E8EE] flex flex-col gap-2">
               {isLoggedIn && (
                 <Link
                   href="/bookings"
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-surface rounded-lg transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#191C20] hover:bg-[#F2F3FA] rounded-lg transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <Ticket className="size-5 text-muted" /> Bookings
+                  <Ticket className="size-5 text-[#7A746D]" /> Bookings
                 </Link>
               )}
               <Link
                 href="/wishlist"
-                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-surface rounded-lg transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#191C20] hover:bg-[#F2F3FA] rounded-lg transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
-                <Heart className="size-5 text-muted" /> Wishlist
+                <Heart className="size-5 text-[#7A746D]" /> Wishlist
               </Link>
               {!isLoggedIn ? (
                 <Link
                   href="?auth=login"
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-surface rounded-lg transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#191C20] hover:bg-[#F2F3FA] rounded-lg transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <LogIn className="size-5 text-muted" /> Log in or sign up
+                  <LogIn className="size-5 text-[#7A746D]" /> Log in or sign up
                 </Link>
               ) : (
                 <button
@@ -355,9 +337,9 @@ export function Navbar({ transparent = false, isLoggedIn = false, destinations =
                     setMenuOpen(false);
                     signOut({ callbackUrl: "/" });
                   }}
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-error hover:bg-error-light/50 rounded-lg transition-colors w-full text-left"
+                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#DC2626] hover:bg-[#FEE2E2]/50 rounded-lg transition-colors w-full text-left"
                 >
-                  <LogOut className="size-5 text-error" /> Log out
+                  <LogOut className="size-5 text-[#DC2626]" /> Log out
                 </button>
               )}
             </div>

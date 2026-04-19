@@ -33,13 +33,37 @@ export default async function HomePage() {
     return [];
   });
 
+  // Fetch featured tours for the hero carousel
+  const featuredTours = await prisma.tour.findMany({
+    where: { status: "PUBLISHED", featured: true },
+    take: 6,
+    orderBy: { updatedAt: "desc" },
+    include: { images: { where: { isPrimary: true }, take: 1 } } as any,
+  }).catch((e) => {
+    console.error("Featured tours query error:", e);
+    return [];
+  });
+
+  const heroTours = featuredTours.map((tour: any) => ({
+    id: tour.id,
+    slug: tour.slug,
+    title: tour.title,
+    location: tour.location,
+    duration: tour.duration,
+    durationType: tour.durationType ?? "days",
+    basePrice: Number(tour.basePrice),
+    rating: Number(tour.rating ?? 5),
+    reviewCount: tour.reviewCount ?? 0,
+    coverImage: tour.images?.[0]?.url,
+  }));
+
   return (
     <>
-      <Navbar transparent isLoggedIn={!!session?.user} destinations={destinations} />
+      <Navbar isLoggedIn={!!session?.user} destinations={destinations} />
       <main>
-        <HeroSection />
-        <DestinationsSection />
+        <HeroSection featuredTours={heroTours} />
         <FeaturedToursSection />
+        <DestinationsSection />
         <PlacesToSee destinations={destinations} />
         <ExperienceSection />
         <WhyUsSection />
